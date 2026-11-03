@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>HUD công thành thời gian thực</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Ma+Shan+Zheng&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#d9b46a}a:hover{color:#f3d9a0}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; position: relative; overflow: hidden; background: #2a1614; font-family: 'Be Vietnam Pro', sans-serif; color: #efe4cf;">
+
+<svg aria-hidden="true" width="1280" height="720" viewBox="0 0 1280 720" style="position: absolute; left: 0; top: 0;">
+<defs>
+<linearGradient id="c-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:#1c1214"></stop><stop offset="0.5" style="stop-color:#6b2f24"></stop><stop offset="1" style="stop-color:#c9813f"></stop></linearGradient>
+<radialGradient id="c-dome" cx="0.5" cy="1" r="0.9"><stop offset="0.7" style="stop-color:#7fd1ff;stop-opacity:0.05"></stop><stop offset="1" style="stop-color:#7fd1ff;stop-opacity:0.35"></stop></radialGradient>
+<radialGradient id="c-ring" cx="0.5" cy="0.5" r="0.5"><stop offset="0.6" style="stop-color:#f3d9a0;stop-opacity:0"></stop><stop offset="0.92" style="stop-color:#f3d9a0;stop-opacity:0.55"></stop><stop offset="1" style="stop-color:#f3d9a0;stop-opacity:0"></stop></radialGradient>
+</defs>
+<rect width="1280" height="720" fill="url(#c-sky)"></rect>
+<path d="M0 380 L140 320 L260 360 L400 300 L560 350 L700 290 L860 340 L1000 300 L1140 350 L1280 320 L1280 720 L0 720 Z" fill="#3b2421" style="opacity:0.8"></path>
+<path d="M300 400 C300 170 980 170 980 400 Z" fill="url(#c-dome)"></path>
+<path d="M300 400 C300 170 980 170 980 400" fill="none" stroke="#9fe0ff" style="stroke-width:2;opacity:0.7;stroke-dasharray:10 6"></path>
+<rect x="330" y="300" width="620" height="110" fill="#3a2a24"></rect>
+<path d="M330 300 l0 -16 l20 0 l0 16 M380 300 l0 -16 l20 0 l0 16 M430 300 l0 -16 l20 0 l0 16 M480 300 l0 -16 l20 0 l0 16 M760 300 l0 -16 l20 0 l0 16 M810 300 l0 -16 l20 0 l0 16 M860 300 l0 -16 l20 0 l0 16 M910 300 l0 -16 l20 0 l0 16" fill="#3a2a24"></path>
+<path d="M560 300 L600 240 L680 240 L720 300 Z" fill="#4a3329"></path>
+<path d="M540 250 L640 200 L740 250 Z" fill="#2a1d18"></path>
+<path d="M600 410 L600 340 C600 320 680 320 680 340 L680 410 Z" fill="#160d0b"></path>
+<rect x="0" y="410" width="1280" height="310" fill="#2c1f1a"></rect>
+<path d="M0 470 C200 450 420 480 640 465 C860 450 1080 482 1280 462 L1280 720 L0 720 Z" fill="#3a2a22"></path>
+<ellipse cx="560" cy="520" rx="150" ry="46" fill="url(#c-ring)"></ellipse>
+<ellipse cx="560" cy="520" rx="150" ry="46" fill="none" stroke="#f3d9a0" style="stroke-width:2;opacity:0.8"></ellipse>
+<path d="M480 520 L640 520 M560 490 L560 550 M505 500 L615 540 M505 540 L615 500" fill="none" stroke="#f3d9a0" style="stroke-width:1.4;opacity:0.6"></path>
+<path d="M548 520 L552 470 C553 460 562 460 564 470 L570 520 Z" fill="#14181a"></path>
+<circle cx="558" cy="455" r="7" fill="#14181a"></circle>
+<path d="M564 474 L600 444" fill="none" stroke="#bfe7ff" style="stroke-width:2.5"></path>
+<path d="M470 560 l4 -16 l4 16 Z M490 566 l4 -16 l4 16 Z M510 572 l4 -16 l4 16 Z M430 566 l4 -16 l4 16 Z M450 574 l4 -16 l4 16 Z M410 580 l4 -16 l4 16 Z M390 570 l4 -16 l4 16 Z M370 584 l4 -16 l4 16 Z" fill="#5fb3d9"></path>
+<path d="M720 500 l4 -16 l4 16 Z M742 506 l4 -16 l4 16 Z M764 498 l4 -16 l4 16 Z M786 508 l4 -16 l4 16 Z M808 500 l4 -16 l4 16 Z M830 510 l4 -16 l4 16 Z M700 512 l4 -16 l4 16 Z M852 502 l4 -16 l4 16 Z" fill="#d9534f"></path>
+<path d="M650 512 L656 470 C657 462 666 462 668 470 L676 512 Z" fill="#3a1414"></path>
+<circle cx="662" cy="456" r="8" fill="#3a1414"></circle>
+</svg>
+
+<div style="position: absolute; left: 610px; top: 418px; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+<div style="font-size: 12px; font-weight: 600; color: #ff9b8f; text-shadow: 0 1px 2px #000;">Trấn thủ · Huyết Sát Phó Tướng · Kết Đan</div>
+<div style="width: 160px; height: 7px; border-radius: 4px; background: rgba(0,0,0,0.6); overflow: hidden;"><div style="width: 57%; height: 7px; background: #d9534f;"></div></div>
+</div>
+<div style="position: absolute; left: 660px; top: 372px; font-family: 'Noto Serif', serif; font-size: 34px; font-weight: 700; color: #ffd36b; text-shadow: 0 2px 4px #000;">-6.820</div>
+<div style="position: absolute; left: 720px; top: 346px; font-size: 14px; font-weight: 700; color: #ffb35c; text-shadow: 0 1px 3px #000;">Bạo kích</div>
+<div style="position: absolute; left: 470px; top: 430px; font-size: 18px; font-weight: 700; color: #8ff0a4; text-shadow: 0 1px 3px #000;">+420</div>
+
+<div style="position: absolute; left: 16px; top: 14px; display: flex; gap: 10px; align-items: center; padding: 8px 12px 8px 8px; border-radius: 40px 12px 12px 40px; background: rgba(18,15,11,0.78); border: 1px solid rgba(217,180,106,0.35);">
+<div style="width: 56px; height: 56px; border-radius: 50%; border: 2px solid #d9b46a; background: #1d1812; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 30px; color: #5fb3d9;">龍</div>
+<div style="display: flex; flex-direction: column; gap: 4px; width: 190px;">
+<div style="font-size: 13px; font-weight: 700;">Ngao Thiên <span style="font-weight: 400; color: #a8987c; font-size: 11px;">· Quân 2.340</span></div>
+<div style="height: 9px; border-radius: 5px; background: rgba(0,0,0,0.55); overflow: hidden;"><div style="width: 71%; height: 9px; background: linear-gradient(90deg, #a32d22, #e5604d);"></div></div>
+<div style="height: 9px; border-radius: 5px; background: rgba(0,0,0,0.55); overflow: hidden;"><div style="width: 48%; height: 9px; background: linear-gradient(90deg, #1f5670, #5fb3d9);"></div></div>
+<div style="height: 9px; border-radius: 5px; background: rgba(0,0,0,0.55); overflow: hidden;"><div style="width: 62%; height: 9px; background: linear-gradient(90deg, #7a5f1a, #d9b46a);"></div></div>
+</div>
+</div>
+
+<div style="position: absolute; left: 640px; top: 10px; transform: translateX(-50%); width: 470px; padding: 8px 14px 10px; border-radius: 12px; background: rgba(18,15,11,0.82); border: 1px solid rgba(217,180,106,0.45); display: flex; flex-direction: column; gap: 8px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-family: 'Noto Serif', serif; font-size: 16px; font-weight: 700; color: #f3d9a0;">Công thành · Phù Vân Thành</span><span style="font-family: 'Noto Serif', serif; font-size: 18px; font-weight: 700; color: #ffcf9c;">05:42</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; font-size: 11px;">
+<div style="display: flex; flex-direction: column; gap: 4px;"><span style="color: #9fe0ff; font-weight: 600;">1 · Phá trận</span><div style="height: 7px; border-radius: 4px; background: #2a231a; overflow: hidden;"><div style="width: 38%; height: 7px; background: #7fd1ff;"></div></div><span style="color: #cdbf9f;">Hộ thành đại trận 38%</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px;"><span style="color: #f3d9a0; font-weight: 600;">2 · Diệt thủ quân</span><div style="height: 7px; border-radius: 4px; background: #2a231a; overflow: hidden;"><div style="width: 25%; height: 7px; background: #d9b46a;"></div></div><span style="color: #cdbf9f;">1.240 / 5.000</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; opacity: 0.55;"><span style="color: #cdbf9f; font-weight: 600;">3 · Cắm cờ</span><div style="height: 7px; border-radius: 4px; background: #2a231a;"></div><span style="color: #a8987c;">Giữ 60 giây</span></div>
+</div>
+</div>
+
+<div style="position: absolute; left: 640px; top: 112px; transform: translateX(-50%); padding: 6px 14px; border-radius: 8px; background: rgba(90,20,18,0.85); border: 1px solid #c8553d; font-size: 12px; color: #ffd9d4; white-space: nowrap;">Phe địch đang bày Khốn Long Trận ở cổng Tây: độn thuật bị chặn trong vùng</div>
+
+<div style="position: absolute; right: 16px; top: 12px; width: 220px; display: flex; flex-direction: column; gap: 6px;">
+<div style="position: relative; width: 220px; height: 132px; border-radius: 10px; border: 2px solid #d9b46a; background: #2b201b; overflow: hidden;">
+<svg aria-hidden="true" width="220" height="132" viewBox="0 0 220 132" style="position: absolute; left: 0; top: 0;">
+<rect x="70" y="20" width="80" height="40" fill="none" stroke="#9fe0ff" style="stroke-width:1.5;stroke-dasharray:4 3"></rect>
+<rect x="100" y="56" width="20" height="6" fill="#d9b46a"></rect>
+<circle cx="60" cy="96" r="3" fill="#5fb3d9"></circle><circle cx="70" cy="104" r="3" fill="#5fb3d9"></circle><circle cx="84" cy="98" r="3" fill="#5fb3d9"></circle><circle cx="96" cy="88" r="3" fill="#5fb3d9"></circle><circle cx="52" cy="110" r="3" fill="#5fb3d9"></circle>
+<circle cx="130" cy="74" r="3" fill="#d9534f"></circle><circle cx="142" cy="80" r="3" fill="#d9534f"></circle><circle cx="156" cy="72" r="3" fill="#d9534f"></circle><circle cx="120" cy="40" r="3" fill="#d9534f"></circle><circle cx="96" cy="36" r="3" fill="#d9534f"></circle>
+<path d="M90 92 L96 80 L102 92 Z" fill="#f3d9a0"></path>
+</svg>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px;"><span style="color: #8fd0ef;">Ta 2.340</span><span style="color: #ff9b8f;">Địch 3.100</span></div>
+<div style="display: flex; flex-direction: column; gap: 3px; padding: 6px 8px; border-radius: 8px; background: rgba(18,15,11,0.7); font-size: 11px;">
+<div><span style="color: #8fd0ef;">Ngao Thiên</span> hạ <span style="color: #ff9b8f;">Huyết Nô Đội Trưởng</span></div>
+<div><span style="color: #8fd0ef;">Thanh Loan Kỵ</span> phá 1 cột trận</div>
+<div><span style="color: #ff9b8f;">Ảnh Sát</span> dùng Huyết Độn rút khỏi cổng</div>
+</div>
+</div>
+
+<div style="position: absolute; left: 16px; top: 108px; width: 230px; padding: 10px; border-radius: 12px; background: rgba(18,15,11,0.8); border: 1px solid rgba(217,180,106,0.35); display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 11px; letter-spacing: 1px; color: #d9b46a;">LỆNH QUÂN</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+<button type="button" style="min-height: 48px; border-radius: 8px; border: 2px solid #d9b46a; background: rgba(90,20,18,0.85); color: #ffd9d4; font-family: inherit; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 18px;">攻</span>Tấn công · Q</button>
+<button type="button" style="min-height: 48px; border-radius: 8px; border: 1px solid rgba(217,180,106,0.4); background: rgba(42,35,26,0.85); color: #efe4cf; font-family: inherit; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 18px;">守</span>Giữ · E</button>
+<button type="button" style="min-height: 48px; border-radius: 8px; border: 1px solid rgba(217,180,106,0.4); background: rgba(42,35,26,0.85); color: #efe4cf; font-family: inherit; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 18px;">退</span>Rút · R</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 5px; font-size: 12px;">
+<div style="display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px; background: rgba(31,86,112,0.35);"><span style="width: 8px; height: 8px; border-radius: 50%; background: #5fb3d9;"></span><span style="flex-grow: 1;">Kiếm Tu Vệ</span><span style="color: #cdbf9f;">1.200</span></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px; background: rgba(31,86,112,0.35);"><span style="width: 8px; height: 8px; border-radius: 50%; background: #5fb3d9;"></span><span style="flex-grow: 1;">Long Nhân Chiến Sĩ</span><span style="color: #cdbf9f;">620</span></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #6b5a46;"></span><span style="flex-grow: 1;">Phù Sư</span><span style="color: #cdbf9f;">400</span></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #6b5a46;"></span><span style="flex-grow: 1;">Thanh Loan Kỵ</span><span style="color: #cdbf9f;">117</span></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #6b5a46;"></span><span style="flex-grow: 1;">Huyền Quy Công Thành</span><span style="color: #cdbf9f;">3</span></div>
+</div>
+<div style="font-size: 10px; color: #a8987c;">Chạm để chọn nhóm, giữ để chọn tất cả</div>
+</div>
+
+<div style="position: absolute; left: 40px; bottom: 40px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 2px solid rgba(239,228,207,0.25); display: flex; align-items: center; justify-content: center;">
+<div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(239,228,207,0.22); border: 2px solid rgba(239,228,207,0.5);"></div>
+</div>
+
+<div style="position: absolute; left: 640px; bottom: 16px; transform: translateX(-60%); display: flex; flex-direction: column; align-items: center; gap: 6px;">
+<div style="font-size: 11px; color: #cdbf9f; text-shadow: 0 1px 2px #000;">Trận pháp và bùa chú · kéo thả lên chiến trường</div>
+<div style="display: flex; gap: 8px;">
+<div style="width: 92px; padding: 6px; border-radius: 10px; background: rgba(18,15,11,0.88); border: 1px solid #9fe0ff; display: flex; flex-direction: column; align-items: center; gap: 2px;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 24px; color: #bfe7ff;">護</span><span style="font-size: 10px; text-align: center;">Hộ Sơn Đại Trận</span><span style="font-size: 10px; color: #a8987c;">300 linh thạch</span></div>
+<div style="width: 92px; padding: 6px; border-radius: 10px; background: rgba(18,15,11,0.88); border: 1px solid #d9b46a; display: flex; flex-direction: column; align-items: center; gap: 2px;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 24px; color: #f3d9a0;">破</span><span style="font-size: 10px; text-align: center;">Phá Trận Phù</span><span style="font-size: 10px; color: #a8987c;">còn 2</span></div>
+<div style="width: 92px; padding: 6px; border-radius: 10px; background: rgba(18,15,11,0.88); border: 1px solid #5a4b34; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0.55;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 24px; color: #a8987c;">困</span><span style="font-size: 10px; text-align: center;">Khốn Long Trận</span><span style="font-size: 10px; color: #a8987c;">Cần Kết Đan</span></div>
+<div style="width: 92px; padding: 6px; border-radius: 10px; background: rgba(18,15,11,0.88); border: 1px solid #5a4b34; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0.55;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 24px; color: #a8987c;">殺</span><span style="font-size: 10px; text-align: center;">Cửu Cung Sát Trận</span><span style="font-size: 10px; color: #a8987c;">Cần Nguyên Anh</span></div>
+</div>
+</div>
+
+<button type="button" style="position: absolute; right: 36px; bottom: 36px; width: 100px; height: 100px; border-radius: 50%; border: 3px solid #d9b46a; background: radial-gradient(circle at 50% 35%, #5a4520, #1d1812); color: #f3d9a0; font-family: 'Ma Shan Zheng', serif; font-size: 48px; cursor: pointer;" aria-label="Đánh thường">斬</button>
+<div style="position: absolute; right: 152px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 2px;"><div style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid #5fb3d9; background: #13232b; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 30px; color: #a8dcf2;">御</div><span style="font-size: 10px; text-shadow: 0 1px 2px #000;">Ngự Kiếm</span></div>
+<div style="position: absolute; right: 158px; bottom: 122px; display: flex; flex-direction: column; align-items: center; gap: 2px;"><div style="position: relative; width: 64px; height: 64px; border-radius: 50%; border: 2px solid #e8a86b; background: conic-gradient(rgba(0,0,0,0.7) 0 35%, #2b1a10 35% 100%); display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 30px; color: #8a7360;">雷<span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Be Vietnam Pro', sans-serif; font-size: 20px; font-weight: 700; color: #fff;">5</span></div><span style="font-size: 10px; text-shadow: 0 1px 2px #000;">Lôi Hỏa Phù</span></div>
+<div style="position: absolute; right: 100px; bottom: 206px; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 120px;"><div style="width: 64px; height: 64px; border-radius: 50%; border: 2px dashed #d9b46a; background: #2a1f10; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 30px; color: #f3d9a0;">萬</div><span style="font-size: 10px; text-align: center; text-shadow: 0 1px 2px #000;">Vạn Kiếm Quy Tông · cần đứng trong trận pháp</span></div>
+<div style="position: absolute; right: 28px; bottom: 156px; display: flex; flex-direction: column; align-items: center; gap: 2px;"><div style="position: relative; width: 64px; height: 64px; border-radius: 50%; border: 2px solid #c8553d; background: #1d1530; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 30px; color: #6e5a7a;">遁<span style="position: absolute; right: -2px; top: -2px; width: 20px; height: 20px; border-radius: 50%; background: #c8553d; color: #fff; font-family: 'Be Vietnam Pro', sans-serif; font-size: 12px; display: flex; align-items: center; justify-content: center;">✕</span></div><span style="font-size: 10px; text-shadow: 0 1px 2px #000;">Bị chặn</span></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

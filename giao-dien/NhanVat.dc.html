@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Bảng nhân vật và trang bị</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Ma+Shan+Zheng&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#d9b46a}a:hover{color:#f3d9a0}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; position: relative; overflow: hidden; background: #120f0b; font-family: 'Be Vietnam Pro', sans-serif; color: #efe4cf;">
+
+<div style="position: absolute; inset: 16px; border-radius: 16px; background: linear-gradient(180deg, #1f1a14, #15110d); border: 1px solid rgba(217,180,106,0.45);"></div>
+
+<div style="position: absolute; left: 36px; right: 36px; top: 26px; height: 48px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(217,180,106,0.25);">
+<span style="font-family: 'Ma Shan Zheng', serif; font-size: 28px; color: #d9b46a; margin-right: 10px;">人物</span>
+<span style="padding: 8px 16px; font-size: 14px; font-weight: 600; color: #f3d9a0; border-bottom: 2px solid #d9b46a;">Thuộc tính</span>
+<span style="padding: 8px 16px; font-size: 14px; color: #a8987c;">Công pháp</span>
+<span style="padding: 8px 16px; font-size: 14px; color: #a8987c;">Linh sủng</span>
+<span style="padding: 8px 16px; font-size: 14px; color: #a8987c;">Tọa kỵ</span>
+<span style="padding: 8px 16px; font-size: 14px; color: #a8987c;">Danh hiệu</span>
+<button type="button" aria-label="Đóng" style="margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(217,180,106,0.5); background: rgba(42,35,26,0.8); color: #f3d9a0; font-size: 18px; cursor: pointer;">✕</button>
+</div>
+
+<div style="position: absolute; left: 40px; top: 96px; display: flex; flex-direction: column; gap: 10px;">
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #5fb3d9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #a8dcf2;">冠</span><span style="font-size: 9px; color: #a8987c;">Mũ</span><span style="position: absolute; right: 4px; top: 2px; font-size: 10px; color: #f3d9a0;">+5</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #5fb3d9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #a8dcf2;">袍</span><span style="font-size: 9px; color: #a8987c;">Đạo bào</span><span style="position: absolute; right: 4px; top: 2px; font-size: 10px; color: #f3d9a0;">+6</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #7fc77f; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #b5e3b5;">帶</span><span style="font-size: 9px; color: #a8987c;">Đai lưng</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #7fc77f; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #b5e3b5;">靴</span><span style="font-size: 9px; color: #a8987c;">Giày</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px dashed #5a4b34; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #5a4b34;">符</span><span style="font-size: 9px; color: #a8987c;">Hộ phù</span></div>
+</div>
+
+<div style="position: absolute; left: 124px; top: 96px; width: 360px; height: 470px; display: flex; flex-direction: column; align-items: center;">
+<div style="font-family: 'Noto Serif', serif; font-size: 22px; font-weight: 700;">Ngao Thiên</div>
+<div style="font-size: 12px; color: #cdbf9f;">Long tộc · Vạn Kiếm Tông · Trúc Cơ trung kỳ</div>
+<svg aria-hidden="true" width="300" height="360" viewBox="0 0 300 360" style="margin-top: 6px;">
+<defs><radialGradient id="n-glow" cx="0.5" cy="0.55" r="0.5"><stop offset="0" style="stop-color:#d9b46a;stop-opacity:0.25"></stop><stop offset="1" style="stop-color:#d9b46a;stop-opacity:0"></stop></radialGradient></defs>
+<rect width="300" height="360" fill="url(#n-glow)"></rect>
+<ellipse cx="150" cy="340" rx="100" ry="14" fill="none" stroke="#d9b46a" style="stroke-width:1.5;opacity:0.6"></ellipse>
+<path d="M114 338 C110 260 118 180 128 110 L172 110 C182 180 190 260 186 338 Z" fill="#e9e3d3"></path>
+<path d="M128 110 C100 130 80 200 70 270 C90 240 108 210 120 180 Z M172 110 C200 130 220 200 230 270 C210 240 192 210 180 180 Z" fill="#dcd5c2"></path>
+<path d="M132 190 L168 190 L164 204 L136 204 Z" fill="#2b6e8f"></path>
+<path d="M138 110 L150 150 L162 110 Z" fill="#5fb3d9"></path>
+<circle cx="150" cy="84" r="24" fill="#e8d2b4"></circle>
+<path d="M124 84 C122 52 140 38 150 38 C160 38 180 50 176 84 C184 140 190 180 182 214 C172 180 170 126 168 96 L132 96 C130 126 128 180 118 214 C110 180 116 140 124 84 Z" fill="#1c2326"></path>
+<path d="M136 44 C126 24 118 18 108 16 M164 44 C174 24 182 18 192 16" fill="none" stroke="#d9b46a" style="stroke-width:3;stroke-linecap:round"></path>
+<path d="M190 150 L236 30" fill="none" stroke="#bfe7ff" style="stroke-width:4"></path>
+<path d="M70 270 C50 290 30 280 10 300 M230 270 C250 290 270 280 290 300" fill="none" stroke="#6fc3a8" style="stroke-width:3;stroke-linecap:round"></path>
+</svg>
+<div style="display: flex; align-items: baseline; gap: 8px; margin-top: -6px;"><span style="font-size: 12px; color: #a8987c;">Lực chiến</span><span style="font-family: 'Noto Serif', serif; font-size: 26px; font-weight: 700; color: #f3d9a0;">18.640</span></div>
+</div>
+
+<div style="position: absolute; left: 500px; top: 96px; display: flex; flex-direction: column; gap: 10px;">
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #b98cff; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #d9c4ff;">劍</span><span style="font-size: 9px; color: #a8987c;">Vũ khí</span><span style="position: absolute; right: 4px; top: 2px; font-size: 10px; color: #f3d9a0;">+7</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #5fb3d9; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #a8dcf2;">鈴</span><span style="font-size: 9px; color: #a8987c;">Phụ khí</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #5fb3d9; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #a8dcf2;">佩</span><span style="font-size: 9px; color: #a8987c;">Ngọc bội</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #7fc77f; display: flex; flex-direction: column; align-items: center; justify-content: center;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #b5e3b5;">戒</span><span style="font-size: 9px; color: #a8987c;">Nhẫn trữ vật</span></div>
+<div style="width: 68px; height: 68px; border-radius: 10px; background: #1a1612; border: 2px solid #f0a640; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(240,166,64,0.4);"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #ffd08a;">寶</span><span style="font-size: 9px; color: #a8987c;">Bản mệnh</span></div>
+</div>
+
+<div style="position: absolute; left: 40px; top: 586px; width: 528px; display: flex; gap: 10px;">
+<div style="flex-grow: 1; padding: 8px 12px; border-radius: 10px; background: rgba(42,35,26,0.8); border: 1px solid rgba(95,179,217,0.5); font-size: 12px;"><div style="color: #8fd0ef; font-weight: 600;">Bộ Thanh Phong Kiếm Trang · 3/6</div><div style="color: #cdbf9f;">2 món: +8% tốc đánh · 4 món: kiếm khí xuyên giáp · 6 món: <span style="color: #7d6f58;">chưa kích hoạt</span></div></div>
+<div style="width: 150px; padding: 8px 10px; border-radius: 10px; background: rgba(42,35,26,0.5); border: 2px dashed #7a3a3a; display: flex; align-items: center; gap: 8px;"><span style="font-family: 'Ma Shan Zheng', serif; font-size: 26px; color: #7a3a3a;">神</span><span style="font-size: 11px; color: #a8987c;"><span style="display: block; color: #ff9b8f; font-weight: 600;">Thần khí</span>Mở ở Hóa Thần</span></div>
+</div>
+
+<div style="position: absolute; left: 600px; top: 96px; width: 640px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 12px; letter-spacing: 1px; color: #d9b46a;">TRẠNG THÁI</div>
+<div style="font-size: 12px;"><div style="display: flex; justify-content: space-between;"><span>Máu</span><span style="color: #cdbf9f;">1.574 / 1.920</span></div><div style="height: 9px; border-radius: 5px; background: #2a231a; overflow: hidden; margin-top: 3px;"><div style="width: 82%; height: 9px; background: linear-gradient(90deg, #a32d22, #e5604d);"></div></div></div>
+<div style="font-size: 12px;"><div style="display: flex; justify-content: space-between;"><span>Năng lượng</span><span style="color: #cdbf9f;">653 / 1.020</span></div><div style="height: 9px; border-radius: 5px; background: #2a231a; overflow: hidden; margin-top: 3px;"><div style="width: 64%; height: 9px; background: linear-gradient(90deg, #1f5670, #5fb3d9);"></div></div></div>
+<div style="font-size: 12px;"><div style="display: flex; justify-content: space-between;"><span>Thể lực</span><span style="color: #cdbf9f;">306 / 340</span></div><div style="height: 9px; border-radius: 5px; background: #2a231a; overflow: hidden; margin-top: 3px;"><div style="width: 90%; height: 9px; background: linear-gradient(90deg, #7a5f1a, #d9b46a);"></div></div></div>
+<div style="font-size: 12px; letter-spacing: 1px; color: #d9b46a; margin-top: 6px;">CHỈ SỐ GỐC</div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
+<div style="display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span>Trí Tuệ</span><span><b>34</b> <span style="color: #9fd06a; font-size: 11px;">+4</span></span></div>
+<div style="display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span>Sức Mạnh</span><span><b>53</b> <span style="color: #9fd06a; font-size: 11px;">+12</span></span></div>
+<div style="display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span>Năng Lượng</span><span><b>48</b></span></div>
+<div style="display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span>Thân Pháp</span><span><b>38</b> <span style="color: #9fd06a; font-size: 11px;">+5</span></span></div>
+<div style="display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span>Tốc Độ</span><span><b>39</b></span></div>
+<div style="display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span>May Mắn</span><span><b>18</b></span></div>
+<div style="display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span>Phòng Thủ</span><span><b>44</b> <span style="color: #9fd06a; font-size: 11px;">+8</span></span></div>
+</div>
+<div style="font-size: 11px; color: #a8987c;">Số xanh là phần cộng thêm từ trang bị</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 12px; letter-spacing: 1px; color: #d9b46a;">CHỈ SỐ CHIẾN ĐẤU</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; font-size: 12px;">
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Ngoại công</span>2.860</div>
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Pháp công</span>1.940</div>
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Phòng ngự</span>1.320</div>
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Kháng pháp</span>980</div>
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Bạo kích</span>14,5%</div>
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Né tránh</span>9,2%</div>
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Thi triển nhanh</span>8%</div>
+<div style="padding: 6px 8px; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-size: 10px; color: #a8987c;">Hồi năng lượng</span>12 / giây</div>
+</div>
+<div style="font-size: 12px; letter-spacing: 1px; color: #d9b46a; margin-top: 4px;">NGŨ HÀNH</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; font-size: 11px; text-align: center;">
+<div style="padding: 5px 0; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: #f3d9a0;">金</span>Kim 120</div>
+<div style="padding: 5px 0; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: #9fd06a;">木</span>Mộc 20</div>
+<div style="padding: 5px 0; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: #8fd0ef;">水</span>Thủy 64</div>
+<div style="padding: 5px 0; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: #ff9b8f;">火</span>Hỏa 58</div>
+<div style="padding: 5px 0; border-radius: 6px; background: rgba(42,35,26,0.7);"><span style="display: block; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: #d6b98a;">土</span>Thổ 30</div>
+</div>
+<div style="padding: 8px 10px; border-radius: 8px; background: rgba(42,35,26,0.7); font-size: 12px;"><span style="color: #d9b46a;">Tư chất</span> · Tam linh căn (Kim, Thủy, Hỏa)<br><span style="color: #d9b46a;">Thông số đặc biệt</span> · <span style="letter-spacing: 3px;">???</span></div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

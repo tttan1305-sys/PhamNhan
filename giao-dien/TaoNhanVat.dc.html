@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Tạo nhân vật</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Ma+Shan+Zheng&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#d9b46a}a:hover{color:#f3d9a0}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; position: relative; overflow: hidden; background: #16201f; font-family: 'Be Vietnam Pro', sans-serif; color: #efe4cf;">
+
+<svg aria-hidden="true" width="1280" height="720" viewBox="0 0 1280 720" style="position: absolute; left: 0; top: 0;">
+<defs>
+<linearGradient id="t-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:#16201f"></stop><stop offset="0.6" style="stop-color:#4d615a"></stop><stop offset="1" style="stop-color:#a8a88a"></stop></linearGradient>
+<radialGradient id="t-glow" cx="0.5" cy="0.56" r="0.3"><stop offset="0" style="stop-color:#f3e3b8;stop-opacity:0.55"></stop><stop offset="1" style="stop-color:#f3e3b8;stop-opacity:0"></stop></radialGradient>
+</defs>
+<rect width="1280" height="720" fill="url(#t-sky)"></rect>
+<path d="M0 470 L120 380 L210 430 L330 320 L420 410 L540 360 L640 300 L760 370 L860 330 L980 420 L1100 350 L1280 410 L1280 720 L0 720 Z" fill="#6f8178" style="opacity:0.55"></path>
+<path d="M380 0 L384 720 M404 0 L407 720 M880 0 L876 720 M900 0 L903 720" fill="none" stroke="#24322d" style="stroke-width:7;opacity:0.5"></path>
+<path d="M386 120 l26 -14 M386 260 l-24 -12 M878 180 l-26 -12 M902 320 l24 -12" fill="none" stroke="#2f4038" style="stroke-width:4"></path>
+<rect width="1280" height="720" fill="url(#t-glow)"></rect>
+<ellipse cx="640" cy="606" rx="150" ry="26" fill="#0d1312" style="opacity:0.55"></ellipse>
+<ellipse cx="640" cy="606" rx="150" ry="26" fill="none" stroke="#d9b46a" style="stroke-width:1.5;opacity:0.6"></ellipse>
+<path d="M600 604 C596 520 604 430 616 330 L664 330 C676 430 684 520 680 604 Z" fill="#e9e3d3"></path>
+<path d="M616 330 C584 350 560 420 548 500 C570 470 590 440 606 410 Z M664 330 C696 350 720 420 732 500 C710 470 690 440 674 410 Z" fill="#dcd5c2"></path>
+<path d="M620 420 L660 420 L656 436 L624 436 Z" fill="#2b6e8f"></path>
+<path d="M626 330 L640 372 L654 330 Z" fill="#5fb3d9"></path>
+<circle cx="640" cy="300" r="26" fill="#e8d2b4"></circle>
+<path d="M612 300 C610 266 630 250 640 250 C652 250 672 264 668 300 C676 360 684 400 676 440 C664 400 662 340 660 312 L620 312 C618 340 616 400 604 440 C596 400 604 360 612 300 Z" fill="#1c2326"></path>
+<path d="M624 258 C612 236 604 228 594 226 M656 258 C668 236 676 228 686 226" fill="none" stroke="#d9b46a" style="stroke-width:3;stroke-linecap:round"></path>
+<path d="M550 500 C520 520 500 500 470 520 M730 500 C760 520 780 500 810 520" fill="none" stroke="#6fc3a8" style="stroke-width:3;stroke-linecap:round;opacity:0.85"></path>
+<path d="M684 360 L720 250" fill="none" stroke="#c9d6d0" style="stroke-width:3"></path>
+</svg>
+
+<div style="position: absolute; left: 0; right: 0; top: 0; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: linear-gradient(180deg, rgba(10,8,6,0.85), rgba(10,8,6,0));">
+<button type="button" style="min-height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid rgba(217,180,106,0.5); background: rgba(18,15,11,0.7); color: #efe4cf; font-family: inherit; font-size: 13px; cursor: pointer;">‹ Trở về</button>
+<div style="display: flex; align-items: center; gap: 14px; font-size: 12px;">
+<span style="color: #a8987c;">1 Phe</span><span style="color: #5a4b34;">—</span>
+<span style="color: #a8987c;">2 Chủng tộc</span><span style="color: #5a4b34;">—</span>
+<span style="color: #f3d9a0; font-weight: 600;">3 Tông môn</span><span style="color: #5a4b34;">—</span>
+<span style="color: #a8987c;">4 Tư chất và tên</span>
+</div>
+<div style="font-family: 'Noto Serif', serif; font-size: 18px; font-weight: 700; color: #f3d9a0;">Tạo nhân vật</div>
+</div>
+
+<div style="position: absolute; left: 24px; top: 72px; display: flex; border-radius: 10px; overflow: hidden; border: 1px solid rgba(217,180,106,0.5);">
+<button type="button" style="min-height: 40px; padding: 0 18px; border: none; background: #1f5670; color: #d6f1ff; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;">Chính đạo</button>
+<button type="button" style="min-height: 40px; padding: 0 18px; border: none; background: rgba(18,15,11,0.8); color: #c9a0a0; font-family: inherit; font-size: 13px; cursor: pointer;">Ma đạo</button>
+</div>
+
+<div style="position: absolute; left: 24px; top: 126px; width: 248px; display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 12px; letter-spacing: 1px; color: #d9b46a;">CHỦNG TỘC</div>
+<button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(217,180,106,0.3); background: rgba(18,15,11,0.72); color: #efe4cf; font-family: inherit; text-align: left; cursor: pointer;"><span style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #a8987c; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 20px;">人</span><span><span style="display: block; font-size: 13px; font-weight: 600;">Nhân tộc</span><span style="display: block; font-size: 11px; color: #a8987c;">Học mọi công pháp, trận pháp</span></span></button>
+<button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(217,180,106,0.3); background: rgba(18,15,11,0.72); color: #efe4cf; font-family: inherit; text-align: left; cursor: pointer;"><span style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #a8987c; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 20px;">虎</span><span><span style="display: block; font-size: 13px; font-weight: 600;">Bạch Hổ tộc</span><span style="display: block; font-size: 11px; color: #a8987c;">Sức Mạnh cao, cận chiến</span></span></button>
+<button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(217,180,106,0.3); background: rgba(18,15,11,0.72); color: #efe4cf; font-family: inherit; text-align: left; cursor: pointer;"><span style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #a8987c; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 20px;">鶴</span><span><span style="display: block; font-size: 13px; font-weight: 600;">Hạc Vũ tộc</span><span style="display: block; font-size: 11px; color: #a8987c;">Thân Pháp, bay lượn</span></span></button>
+<button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 10px; border-radius: 10px; border: 2px solid #d9b46a; background: rgba(58,44,20,0.85); color: #f3d9a0; font-family: inherit; text-align: left; cursor: pointer;"><span style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #d9b46a; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 20px;">龍</span><span><span style="display: block; font-size: 13px; font-weight: 600;">Long tộc</span><span style="display: block; font-size: 11px; color: #e6d7bd;">Huyết mạch rồng: Năng Lượng, Phòng Thủ</span></span></button>
+<button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(217,180,106,0.3); background: rgba(18,15,11,0.72); color: #efe4cf; font-family: inherit; text-align: left; cursor: pointer;"><span style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #a8987c; display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 20px;">鳳</span><span><span style="display: block; font-size: 13px; font-weight: 600;">Phượng tộc</span><span style="display: block; font-size: 11px; color: #a8987c;">Hỏa thuộc tính, hồi sinh</span></span></button>
+</div>
+
+<div style="position: absolute; left: 24px; bottom: 24px; width: 248px; padding: 10px 12px; border-radius: 12px; background: rgba(18,15,11,0.8); border: 1px solid rgba(217,180,106,0.35); display: flex; flex-direction: column; gap: 6px;">
+<div style="font-size: 12px; letter-spacing: 1px; color: #d9b46a;">TƯ CHẤT</div>
+<div style="font-size: 14px; font-weight: 600;">Tam linh căn · Kim, Thủy, Hỏa</div>
+<div style="font-size: 11px; color: #a8987c;">Thông số đặc biệt: ? ? ? (thức tỉnh sau)</div>
+<button type="button" style="min-height: 36px; border-radius: 8px; border: 1px solid rgba(217,180,106,0.6); background: rgba(58,44,20,0.6); color: #f3d9a0; font-family: inherit; font-size: 12px; cursor: pointer;">Gieo lại linh căn · còn 3 lần</button>
+</div>
+
+<div style="position: absolute; left: 640px; bottom: 26px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px;">
+<div style="display: flex; gap: 8px;">
+<button type="button" style="min-width: 64px; min-height: 40px; border-radius: 20px; border: 2px solid #d9b46a; background: rgba(58,44,20,0.85); color: #f3d9a0; font-family: inherit; font-size: 13px; cursor: pointer;">Nam</button>
+<button type="button" style="min-width: 64px; min-height: 40px; border-radius: 20px; border: 1px solid rgba(217,180,106,0.4); background: rgba(18,15,11,0.75); color: #efe4cf; font-family: inherit; font-size: 13px; cursor: pointer;">Nữ</button>
+</div>
+<div style="display: flex; gap: 6px; align-items: center;">
+<label for="ten" style="font-size: 12px; color: #a8987c;">Đạo hiệu</label>
+<input id="ten" value="Ngao Thiên" style="width: 200px; height: 40px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(217,180,106,0.5); background: rgba(10,8,6,0.8); color: #f3d9a0; font-family: 'Noto Serif', serif; font-size: 16px;">
+<button type="button" aria-label="Tên ngẫu nhiên" style="width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(217,180,106,0.5); background: rgba(18,15,11,0.8); color: #f3d9a0; font-family: 'Ma Shan Zheng', serif; font-size: 20px; cursor: pointer;">卦</button>
+</div>
+</div>
+
+<div style="position: absolute; right: 24px; top: 72px; width: 340px; display: flex; flex-direction: column; gap: 12px;">
+<div style="font-size: 12px; letter-spacing: 1px; color: #d9b46a;">BÁI NHẬP TÔNG MÔN</div>
+<div style="display: flex; justify-content: space-between;">
+<button type="button" style="display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 0; color: #cdbf9f; font-family: inherit; cursor: pointer;"><span style="width: 56px; height: 56px; border-radius: 50%; border: 1px solid #a8987c; background: rgba(18,15,11,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 28px;">儒</span><span style="font-size: 10px;">Hạo Nhiên</span></button>
+<button type="button" style="display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 0; color: #f3d9a0; font-family: inherit; cursor: pointer;"><span style="width: 56px; height: 56px; border-radius: 50%; border: 2px solid #d9b46a; background: rgba(58,44,20,0.9); display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 28px; box-shadow: 0 0 14px rgba(217,180,106,0.5);">劍</span><span style="font-size: 10px; font-weight: 600;">Vạn Kiếm</span></button>
+<button type="button" style="display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 0; color: #cdbf9f; font-family: inherit; cursor: pointer;"><span style="width: 56px; height: 56px; border-radius: 50%; border: 1px solid #a8987c; background: rgba(18,15,11,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 28px;">獸</span><span style="font-size: 10px;">Vạn Thú</span></button>
+<button type="button" style="display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 0; color: #cdbf9f; font-family: inherit; cursor: pointer;"><span style="width: 56px; height: 56px; border-radius: 50%; border: 1px solid #a8987c; background: rgba(18,15,11,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 28px;">法</span><span style="font-size: 10px;">Vạn Pháp</span></button>
+<button type="button" style="display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 0; color: #cdbf9f; font-family: inherit; cursor: pointer;"><span style="width: 56px; height: 56px; border-radius: 50%; border: 1px solid #a8987c; background: rgba(18,15,11,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Ma Shan Zheng', serif; font-size: 28px;">陣</span><span style="font-size: 10px;">Vô Cực Trận</span></button>
+</div>
+<div style="padding: 14px; border-radius: 12px; background: rgba(18,15,11,0.82); border: 1px solid rgba(217,180,106,0.45); display: flex; flex-direction: column; gap: 8px;">
+<div style="display: flex; align-items: baseline; justify-content: space-between;"><span style="font-family: 'Noto Serif', serif; font-size: 20px; font-weight: 700; color: #f3d9a0;">Vạn Kiếm Tông</span><span style="font-size: 11px; color: #a8987c;">Độ khó: Dễ</span></div>
+<div style="font-size: 12px; color: #cdbf9f;">Kiếm tu, sát thương đơn mục tiêu cao nhất. Mạnh khi đấu tay đôi và hạ tướng trấn thủ.</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; font-size: 12px;">
+<div style="padding: 6px 8px; border-radius: 8px; background: rgba(42,35,26,0.8);"><span style="display: block; font-size: 10px; color: #a8987c;">Chủ tu khởi đầu</span>Thanh Phong Kiếm Kinh</div>
+<div style="padding: 6px 8px; border-radius: 8px; background: rgba(42,35,26,0.8);"><span style="display: block; font-size: 10px; color: #a8987c;">Bí tịch trấn tông</span>Vạn Kiếm Quy Tông</div>
+<div style="padding: 6px 8px; border-radius: 8px; background: rgba(42,35,26,0.8);"><span style="display: block; font-size: 10px; color: #a8987c;">Thưởng chỉ số</span>+6 Sức Mạnh, +6 Tốc Độ</div>
+<div style="padding: 6px 8px; border-radius: 8px; background: rgba(42,35,26,0.8);"><span style="display: block; font-size: 10px; color: #a8987c;">Vũ khí sở trường</span>Phi kiếm, trường kiếm</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 11px;">
+<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 64px; color: #a8987c;">Tấn công</span><div style="flex-grow: 1; height: 6px; border-radius: 3px; background: #2a231a;"><div style="width: 92%; height: 6px; border-radius: 3px; background: #d9b46a;"></div></div></div>
+<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 64px; color: #a8987c;">Phòng thủ</span><div style="flex-grow: 1; height: 6px; border-radius: 3px; background: #2a231a;"><div style="width: 45%; height: 6px; border-radius: 3px; background: #d9b46a;"></div></div></div>
+<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 64px; color: #a8987c;">Hỗ trợ</span><div style="flex-grow: 1; height: 6px; border-radius: 3px; background: #2a231a;"><div style="width: 30%; height: 6px; border-radius: 3px; background: #d9b46a;"></div></div></div>
+<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 64px; color: #a8987c;">Cơ động</span><div style="flex-grow: 1; height: 6px; border-radius: 3px; background: #2a231a;"><div style="width: 75%; height: 6px; border-radius: 3px; background: #d9b46a;"></div></div></div>
+</div>
+</div>
+</div>
+
+<button type="button" style="position: absolute; right: 24px; bottom: 24px; width: 340px; min-height: 56px; border-radius: 12px; border: 2px solid #d9b46a; background: linear-gradient(180deg, #6b5226, #3a2c14); color: #f3d9a0; font-family: 'Noto Serif', serif; font-size: 20px; font-weight: 700; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 22px rgba(217,180,106,0.35);">Bắt đầu tu tiên</button>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
