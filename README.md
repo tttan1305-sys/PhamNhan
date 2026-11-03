@@ -48,3 +48,18 @@ Script chạy lần lượt ba bước:
 3. `v6/icons.py` thêm biểu tượng chiêu thức và sửa bố cục chữ.
 
 Video quay các bản (file `.mp4`, tổng khoảng 330 MB) không đưa lên repo vì quá nặng.
+
+## Bản Unity (giai đoạn 1)
+
+`unity/PhamNhan/` là dự án Unity 6 (6000.0.84f1). Giai đoạn 1 chuyển màn công thành sang C# để chơi trên điện thoại Android, có điều khiển cảm ứng.
+
+| Đường dẫn | Nội dung |
+|---|---|
+| `Assets/Scripts/Sim/` | Lõi mô phỏng trận bằng C# thuần, không phụ thuộc Unity: quân, tướng, quân sư AI, trận nhãn, kết giới, chiêu thức. |
+| `Assets/Scripts/View/` | Phần Unity: vẽ chiến trường, máy quay, giao diện, cần gạt và nút cảm ứng, màn hình chính. |
+| `Assets/Editor/BuildScript.cs` | Menu **Phàm Nhân → Build Android APK**, cũng là hàm GitHub Actions gọi để build. |
+| `unity/SimTest/` | Chạy thử trận ở chế độ tự đánh không cần Unity: `dotnet run --project unity/SimTest -- 900`. |
+
+**Mở trong Unity**: thêm thư mục `unity/PhamNhan` vào Unity Hub rồi bấm Play. Trò chơi tự khởi động, không cần kéo thả gì vào cảnh.
+
+**Build tự động**: mỗi lần đẩy lên `main`, quy trình `.github/workflows/android.yml` build APK và đăng lên trang Releases, mục *ban-thu-nghiem*. Cần ba mục bí mật của repo là `UNITY_EMAIL`, `UNITY_PASSWORD`, `UNITY_LICENSE`; khi thiếu, quy trình bỏ qua bước build.

@@ -1,0 +1,90 @@
+name: Build APK Android
+
+on:
+  push:
+    branches: [main]
+    paths: ['unity/**', '.github/workflows/android.yml']
+  pull_request:
+    paths: ['unity/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kiểm tra tài khoản Unity trong mục bí mật
+        id: check
+        env:
+          UL: ${{ secrets.UNITY_LICENSE }}
+          UE: ${{ secrets.UNITY_EMAIL }}
+          UP: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          if [ -z "$UL" ] || [ -z "$UE" ] || [ -z "$UP" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Chưa có đủ UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD trong Settings > Secrets and variables > Actions, bỏ qua bước build."
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.check.outputs.ok == 'true'
+
+      - name: Giải phóng dung lượng máy build
+        if: steps.check.outputs.ok == 'true'
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - uses: actions/cache@v4
+        if: steps.check.outputs.ok == 'true'
+        with:
+          path: unity/PhamNhan/Library
+          key: Library-Android-${{ hashFiles('unity/PhamNhan/Assets/**', 'unity/PhamNhan/Packages/**', 'unity/PhamNhan/ProjectSettings/**') }}
+          restore-keys: Library-Android-
+
+      - name: Build bằng Unity
+        if: steps.check.outputs.ok == 'true'
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: unity/PhamNhan
+          targetPlatform: Android
+          buildMethod: PhamNhan.EditorTools.BuildScript.BuildAndroid
+          versioning: None
+
+      - name: Tìm file APK
+        if: steps.check.outputs.ok == 'true'
+        run: |
+          sudo find . -name "*.apk" -not -path "*/Library/*" | head
+          APK=$(sudo find . -name "PhamNhan.apk" -not -path "*/Library/*" | head -1)
+          test -n "$APK"
+          sudo cp "$APK" PhamNhan.apk
+
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.ok == 'true'
+        with:
+          name: PhamNhan-Android
+          path: PhamNhan.apk
+
+      - name: Đăng lên trang Releases để tải thẳng về điện thoại
+        if: steps.check.outputs.ok == 'true' && github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ban-thu-nghiem
+          name: Phàm Nhân · bản thử nghiệm Android
+          body: "Bản build tự động từ nhánh main (lần chạy ${{ github.run_number }}). Tải PhamNhan.apk về điện thoại Android rồi mở để cài."
+          prerelease: true
+          files: PhamNhan.apk
