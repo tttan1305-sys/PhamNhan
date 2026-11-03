@@ -14,7 +14,7 @@ permissions:
 jobs:
   android:
     name: Build APK
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Kiểm tra tài khoản Unity trong mục bí mật
         id: check
