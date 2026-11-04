@@ -27,7 +27,7 @@ namespace PhamNhan.Sim
             foreach (var e in units) { if (e.dead || e.team != 1 || !Reachable(h, e)) continue; if (Dist(h, e) - e.r < Rr && M.AngDiff(Ang(h, e), h.face) < half) tg.Add(e); }
             foreach (var p in LiveEyes()) if (Dist(h, p) - p.r < Rr && M.AngDiff(Ang(h, p), h.face) < half + 0.3f) tg.Add(p);
             foreach (var e in tg) { bool crit = Rnd() < 0.16f; float d = R(95, 115) * (crit ? 1.8f : 1); if (e.IsEye) d *= 1.25f; Damage(e, d, h, new HitOpt { crit = crit }); Sparks(e.x, e.y - 8, GOLD, 6); }
-            fx.Add(new Fx { type = FxT.Slash, x = h.x, y = h.y, a = h.face, dir = h.swingDir, t = 0.2f, max = 0.2f });
+            Snd("slash", h); fx.Add(new Fx { type = FxT.Slash, x = h.x, y = h.y, a = h.face, dir = h.swingDir, t = 0.2f, max = 0.2f });
             if (tg.Count > 0) Shake(2.5f);
         }
 
@@ -39,7 +39,7 @@ namespace PhamNhan.Sim
             if (ey != null) list = new List<Body> { ey, ey, ey };
             else list = units.Where(e => !e.dead && e.team == 1 && Dist(h, e) < 460 && Reachable(h, e) && (e != boss || boss.active)).OrderBy(e => Dist(h, e)).Take(3).Cast<Body>().ToList();
             if (list.Count == 0) return false;
-            h.cdYu = 4; h.mp -= 40; int cast = ++castN;
+            h.cdYu = 4; h.mp -= 40; int cast = ++castN; Snd("yu", h);
             for (int i = 0; i < list.Count; i++)
             {
                 float a = h.face + (i - 1) * 0.9f;
@@ -66,7 +66,7 @@ namespace PhamNhan.Sim
             var h = hero; if (h.dead || h.cdLoi > 0 || loi <= 0) return false;
             if (!pt.HasValue) { var ey = EyeFor(Elem.Hoa, 430); if (ey != null) pt = ey.P; else { pt = BestCluster(h, 380, 1); if (!pt.HasValue) pt = new V2(h.x + M.Cos(h.face) * 200, h.y + M.Sin(h.face) * 200); } }
             if (barrier && Dist(pt.Value, C) < BAR_R) return false;
-            h.cdLoi = 4; loi--;
+            h.cdLoi = 4; loi--; Snd("loiCast", h);
             teles.Add(new Tele { x = pt.Value.x, y = pt.Value.y, r = 115, t = 0.32f, max = 0.32f, team = 0, kind = "loi", cast = ++castN });
             return true;
         }
@@ -76,7 +76,7 @@ namespace PhamNhan.Sim
             foreach (var e in eyes) if (!e.dead && e.revealed && M.Dist(e.x, e.y, tl.x, tl.y) < tl.r + e.r + 10) Damage(e, 260, hero, new HitOpt { elem = Elem.Hoa, cast = tl.cast, show = true });
             var pts = new V2[11]; float cx = tl.x + R(-40, 40), cy = tl.y - 520;
             for (int i = 0; i <= 10; i++) { float k = i / 10f; pts[i] = new V2(cx + (tl.x - cx) * k + (i > 0 && i < 10 ? R(-26, 26) : 0), cy + (tl.y - cy) * k); }
-            fx.Add(new Fx { type = FxT.Bolt, x = tl.x, y = tl.y, t = 0.35f, max = 0.35f, pts = pts });
+            Snd("loi", tl.x, tl.y); fx.Add(new Fx { type = FxT.Bolt, x = tl.x, y = tl.y, t = 0.35f, max = 0.35f, pts = pts });
             decals.Add(new Decal { x = tl.x, y = tl.y, r = 70, t = 14, type = "scorch" });
             Flash(0.35f, new Rgb(255, 200, 150)); Shake(9); Sparks(tl.x, tl.y, new Rgb(255, 190, 120), 22);
         }
@@ -86,7 +86,7 @@ namespace PhamNhan.Sim
             var h = hero; if (h.dead || anCd > 0 || an <= 0) return false;
             if (!pt.HasValue) { var ey = EyeFor(Elem.Tho, 430); if (ey != null) pt = ey.P; else { pt = BestCluster(h, 380, 1); if (!pt.HasValue) pt = new V2(h.x + M.Cos(h.face) * 180, h.y + M.Sin(h.face) * 180); } }
             if (barrier && Dist(pt.Value, C) < BAR_R) return false;
-            anCd = 3; an--;
+            anCd = 3; an--; Snd("anCast", h);
             teles.Add(new Tele { x = pt.Value.x, y = pt.Value.y, r = 110, t = 0.6f, max = 0.6f, team = 0, kind = "an", cast = ++castN });
             return true;
         }
@@ -94,7 +94,7 @@ namespace PhamNhan.Sim
         {
             for (int i = 0; i < units.Count; i++) { var e = units[i]; if (e.dead || e.team != 1) continue; if (M.Dist(e.x, e.y, tl.x, tl.y) < tl.r + e.r) Damage(e, R(150, 185), hero, new HitOpt { stun = 1.2f }); }
             foreach (var e in eyes) if (!e.dead && e.revealed && M.Dist(e.x, e.y, tl.x, tl.y) < tl.r + e.r + 10) Damage(e, 320, hero, new HitOpt { elem = Elem.Tho, cast = tl.cast, show = true });
-            Boom(tl.x, tl.y, new Rgb(214, 170, 106), 30, tl.r * 1.6f); decals.Add(new Decal { x = tl.x, y = tl.y, r = 85, t = 16, type = "crack", seed = (int)(Rnd() * 1000) });
+            Snd("an", tl.x, tl.y); Boom(tl.x, tl.y, new Rgb(214, 170, 106), 30, tl.r * 1.6f); decals.Add(new Decal { x = tl.x, y = tl.y, r = 85, t = 16, type = "crack", seed = (int)(Rnd() * 1000) });
             Glyph("鎮", tl.x, tl.y - 40, 0.8f, new Rgb(224, 184, 120)); Shake(13);
         }
 
@@ -102,7 +102,7 @@ namespace PhamNhan.Sim
         {
             var h = hero; if (h.dead || h.cdVan > 0 || h.mp < 160) return false;
             if (InZone(h, "ho") == null) { FloatT(h.x, h.y - 50, "Cần đứng trong Hộ Sơn Đại Trận", Rgb.Hex("#ffb3a8"), 13); return false; }
-            h.cdVan = 28; h.mp -= 160;
+            h.cdVan = 28; h.mp -= 160; Snd("van", h);
             zones.Add(new Zone { type = "van", x = h.x, y = h.y, r = 270, t = 3.4f, max = 3.4f, tick = 0 });
             ShowBanner("Vạn Kiếm Quy Tông", "Muôn kiếm từ trời giáng xuống", 1.8f, "萬");
             Flash(0.3f, GOLD); Shake(8);
@@ -111,7 +111,7 @@ namespace PhamNhan.Sim
         public bool CastYan()
         {
             var h = hero; if (h.dead || h.cdYan > 0 || h.mp < 30) return false;
-            h.cdYan = 10; h.mp -= 30; waves.Add(new Wave { x = h.x, y = h.y, r = 20, max = 720 }); veinGlow = 5;
+            h.cdYan = 10; h.mp -= 30; Snd("yan", h); waves.Add(new Wave { x = h.x, y = h.y, r = 20, max = 720 }); veinGlow = 5;
             Glyph("眼", h.x, h.y - 70, 1, new Rgb(230, 210, 255)); Shake(4);
             return true;
         }
@@ -120,12 +120,12 @@ namespace PhamNhan.Sim
             var h = hero; if (h.dead || h.cdDon > 0 || h.st < 30 || h.dashT > 0) return false;
             if (InZone(h, "khon") != null) { if (t - h.blkT > 1) { FloatT(h.x, h.y - 50, "Độn thuật bị chặn", Rgb.Hex("#ff8c84"), 14); h.blkT = t; } return false; }
             if (!dir.HasValue) { float m = M.Hypot(IN.mx, IN.my); dir = m > 0.1f ? new V2(IN.mx / m, IN.my / m) : new V2(M.Cos(h.face), M.Sin(h.face)); }
-            h.cdDon = 1.8f; h.st -= 30; h.dashDir = dir.Value; h.dashT = 0.18f; h.invul = 0.32f;
+            h.cdDon = 1.8f; h.st -= 30; Snd("don", h); h.dashDir = dir.Value; h.dashT = 0.18f; h.invul = 0.32f;
             return true;
         }
         public bool PlaceHo()
         {
-            if (hero.dead || hoCd > 0) return false; hoCd = 24;
+            if (hero.dead || hoCd > 0) return false; hoCd = 24; Snd("ho", hero);
             zones.Add(new Zone { type = "ho", x = hero.x, y = hero.y, r = 150, t = 16, max = 16 });
             PushFeed("Ngao Thiên bày Hộ Sơn Đại Trận");
             return true;
@@ -139,14 +139,14 @@ namespace PhamNhan.Sim
                 else { Body best = null; float bd = 370; foreach (var e in LiveEyes()) { float d = Dist(h, e); if (d < bd) { bd = d; best = e; } } target = best; }
             }
             if (target == null && zt == null) return false;
-            pha--; phaCd = 1.2f;
+            pha--; phaCd = 1.2f; Snd("phaCast", h);
             float tx = zt != null ? zt.x : target.x, ty = zt != null ? zt.y : target.y;
             proj.Add(new Proj { kind = PKind.Pha, x = h.x, y = h.y - 24, sx = h.x, sy = h.y - 24, tgt = target, zoneTgt = zt, t = 0, max = M.Max(0.35f, M.Dist(h.x, h.y, tx, ty) / 700), team = 0 });
             return true;
         }
         public void UseDan()
         {
-            if (hero.dead || dan <= 0 || danCd > 0 || hero.hp >= hero.max) return; dan--; danCd = 6; hero.hp = M.Min(hero.max, hero.hp + hero.max * 0.35f);
+            if (hero.dead || dan <= 0 || danCd > 0 || hero.hp >= hero.max) return; dan--; danCd = 6; Snd("dan", hero); hero.hp = M.Min(hero.max, hero.hp + hero.max * 0.35f);
             FloatT(hero.x, hero.y - 50, "+" + M.Fmt(hero.max * 0.35f), Rgb.Hex("#7fd18b"), 16);
             for (int i = 0; i < 14; i++) fx.Add(new Fx { type = FxT.P, x = hero.x + R(-16, 16), y = hero.y + R(-10, 10), vx = 0, vy = R(-70, -30), t = 0.8f, max = 0.8f, col = new Rgb(127, 209, 139), s = 3 });
         }
@@ -226,7 +226,7 @@ namespace PhamNhan.Sim
                         p.dead = true;
                         if (p.zoneTgt != null) { p.zoneTgt.t = 0; PushFeed("Phá Trận Phù phá vỡ Khốn Long Trận"); }
                         else if (p.tgt is Eye) { var e = (Eye)p.tgt; if (e.seals > 0) Damage(e, 0, hero, new HitOpt { elem = Elem.Pha, cast = ++castN }); else Damage(e, 900, hero, new HitOpt { show = true, crit = true }); }
-                        Glyph("破", tx, ty - 30, 0.9f, new Rgb(255, 215, 120)); Boom(tx, ty, new Rgb(255, 200, 110), 26, 200); Shake(10);
+                        Snd("pha", tx, ty); Glyph("破", tx, ty - 30, 0.9f, new Rgb(255, 215, 120)); Boom(tx, ty, new Rgb(255, 200, 110), 26, 200); Shake(10);
                     }
                 }
             }
@@ -243,6 +243,7 @@ namespace PhamNhan.Sim
             }
             foreach (var e in eyes) if (!e.dead && e.revealed && M.Dist(e.x, e.y, tl.x, tl.y) < tl.r + e.r + 10) Damage(e, 260, src, new HitOpt { elem = tl.elem, cast = tl.cast, show = true });
             bool near = M.Dist(hero.x, hero.y, tl.x, tl.y) < 700;
+            Snd(tl.kind, tl.x, tl.y);
             if (tl.kind == "an") { Boom(tl.x, tl.y, new Rgb(214, 170, 106), 30, tl.r * 1.6f); decals.Add(new Decal { x = tl.x, y = tl.y, r = 85, t = 16, type = "crack" }); Glyph("鎮", tl.x, tl.y - 40, 0.8f, new Rgb(224, 184, 120)); if (near) Shake(11); }
             else if (tl.kind == "fire") { Boom(tl.x, tl.y, new Rgb(255, 138, 74), 30, tl.r * 1.5f); decals.Add(new Decal { x = tl.x, y = tl.y, r = 75, t = 14, type = "scorch" }); for (int i = 0; i < 18; i++) fx.Add(new Fx { type = FxT.P, x = tl.x + R(-45, 45), y = tl.y + R(-22, 22), vx = R(-20, 20), vy = R(-150, -60), t = R(0.5f, 0.9f), max = 0.9f, col = new Rgb(255, 150, 60), s = R(2, 4) }); Glyph("炎", tl.x, tl.y - 40, 0.7f, new Rgb(255, 150, 80)); if (near) Shake(8); }
             else if (tl.kind == "ice") { Boom(tl.x, tl.y, new Rgb(150, 210, 255), 24, tl.r * 1.4f); fx.Add(new Fx { type = FxT.Ice, x = tl.x, y = tl.y, t = 0.8f, max = 0.8f, r = tl.r }); Glyph("冰", tl.x, tl.y - 40, 0.7f, new Rgb(170, 220, 255)); if (near) Shake(6); }
@@ -251,7 +252,7 @@ namespace PhamNhan.Sim
         void MaStrike(Tele tl)
         {
             for (int i = 0; i < units.Count; i++) { var e = units[i]; if (e.dead || e.team != 0) continue; if (M.Dist(e.x, e.y, tl.x, tl.y) < tl.r + e.r) Damage(e, e.champ ? tl.dmg : R(45, 65), tl.src, new HitOpt { stun = tl.stun }); }
-            Boom(tl.x, tl.y, tl.col, 26, tl.r * 1.5f); decals.Add(new Decal { x = tl.x, y = tl.y, r = tl.r * 0.7f, t = 10, type = "blood" }); Glyph(tl.g, tl.x, tl.y - 40, 0.8f, tl.col);
+            Snd("ma", tl.x, tl.y); Boom(tl.x, tl.y, tl.col, 26, tl.r * 1.5f); decals.Add(new Decal { x = tl.x, y = tl.y, r = tl.r * 0.7f, t = 10, type = "blood" }); Glyph(tl.g, tl.x, tl.y - 40, 0.8f, tl.col);
             Shake(M.Dist(hero.x, hero.y, tl.x, tl.y) < 600 ? 8 : 0);
         }
 
@@ -291,11 +292,11 @@ namespace PhamNhan.Sim
                             var e = units[i]; if (e.dead || e.team != 0) continue;
                             if (M.Dist(e.x, e.y, tl.x, tl.y) < tl.r + e.r) { Damage(e, e == hero ? 200 : e.champ ? 120 : R(18, 26), null); float a = M.Atan2(e.y - tl.y, e.x - tl.x), push = e.t == "quy" ? 18 : 70; e.x += M.Cos(a) * push; e.y += M.Sin(a) * push; if (e != hero) e.stun = M.Max(e.stun, 0.4f); }
                         }
-                        RingFx(tl.x, tl.y, 20, tl.r + 25, 0.45f, tl.col); Sparks(tl.x, tl.y - 70, tl.col, 16); Shake(M.Dist(hero.x, hero.y, tl.x, tl.y) < 700 ? 6 : 0);
+                        Snd("shock", tl.x, tl.y); RingFx(tl.x, tl.y, 20, tl.r + 25, 0.45f, tl.col); Sparks(tl.x, tl.y - 70, tl.col, 16); Shake(M.Dist(hero.x, hero.y, tl.x, tl.y) < 700 ? 6 : 0);
                         break;
                     case "tram":
                         for (int i = 0; i < units.Count; i++) { var e = units[i]; if (e.dead || e.team != 0) continue; if (M.Dist(e.x, e.y, tl.x, tl.y) < tl.r + e.r) Damage(e, e == hero ? tl.dmg : e.champ ? tl.dmg * 0.75f : tl.dmg * 0.12f, boss); }
-                        Boom(tl.x, tl.y, new Rgb(229, 96, 77), 30, tl.r * 1.6f); Shake(M.Dist(hero.x, hero.y, tl.x, tl.y) < 600 ? 10 : 0); decals.Add(new Decal { x = tl.x, y = tl.y, r = tl.r * 0.8f, t = 10, type = "blood" });
+                        Snd("tram", tl.x, tl.y); Boom(tl.x, tl.y, new Rgb(229, 96, 77), 30, tl.r * 1.6f); Shake(M.Dist(hero.x, hero.y, tl.x, tl.y) < 600 ? 10 : 0); decals.Add(new Decal { x = tl.x, y = tl.y, r = tl.r * 0.8f, t = 10, type = "blood" });
                         break;
                 }
             }

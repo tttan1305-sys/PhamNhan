@@ -176,7 +176,7 @@ namespace PhamNhan.Sim
                 if (a.dead || a.team != u.team || Dist(a, u) > Rr) continue; float k = a.champ || a == boss ? kc : kt; if (a.hp >= a.max) continue;
                 float add = a.max * k; a.hp = M.Min(a.max, a.hp + add); if (a.champ && add > 100) FloatT(a.x, a.y - 46, "+" + M.Fmt(add), u.team == 1 ? Rgb.Hex("#ffd07a") : Rgb.Hex("#7fd18b"), 13);
             }
-            RingFx(u.x, u.y, 20, Rr, 0.7f, col); Glyph(glyph, u.x, u.y - 70, 0.9f, col);
+            Snd("heal", u); RingFx(u.x, u.y, 20, Rr, 0.7f, col); Glyph(glyph, u.x, u.y - 70, 0.9f, col);
             for (int i = 0; i < 18; i++) { float a = R(0, M.TAU), r = R(20, Rr * 0.8f); fx.Add(new Fx { type = FxT.P, x = u.x + M.Cos(a) * r, y = u.y + M.Sin(a) * r * 0.6f, vx = 0, vy = R(-60, -25), t = 0.9f, max = 0.9f, col = col, s = 3 }); }
         }
 
@@ -186,7 +186,7 @@ namespace PhamNhan.Sim
             if (u.team == 0)
             {
                 var ey = AsgEye(u);
-                if (phase == 1 && ey != null && !ey.dead && !ey.revealed && u.yanT <= 0 && Dist(u, ey) < 520) { u.yanT = 10; waves.Add(new Wave { x = u.x, y = u.y, r = 20, max = 620, by = u }); Glyph("眼", u.x, u.y - 70, 1, new Rgb(230, 210, 255)); }
+                if (phase == 1 && ey != null && !ey.dead && !ey.revealed && u.yanT <= 0 && Dist(u, ey) < 520) { u.yanT = 10; Snd("yan", u); waves.Add(new Wave { x = u.x, y = u.y, r = 20, max = 620, by = u }); Glyph("眼", u.x, u.y - 70, 1, new Rgb(230, 210, 255)); }
                 if (u.key == "thanh" && u.healT <= 0)
                 {
                     int needH = 0; foreach (var a in allies) if (!a.dead && Dist(a, u) < 300 && a.hp < a.max * 0.7f) needH += 3;
@@ -238,7 +238,7 @@ namespace PhamNhan.Sim
                 for (int i = 0; i < 5; i++) fx.Add(new Fx { type = FxT.Ghost, x = u.x + (tg.x - u.x) * i / 5, y = u.y + (tg.y - u.y) * i / 5, a = u.face, t = 0.3f, max = 0.3f, col = new Rgb(230, 90, 70) });
                 u.x = tg.x + M.Cos(a) * 55; u.y = tg.y + M.Sin(a) * 55;
             }
-            teles.Add(new Tele { x = pt2.x, y = pt2.y, r = u.key == "ta" ? 140 : 120, t = u.key == "lang" ? 0.55f : 0.95f, max = u.key == "lang" ? 0.55f : 0.95f, team = 1, kind = "mtele", col = D.col, src = u, dmg = 320, stun = u.key == "ta" ? 1.4f : 0, g = D.g });
+            Snd("maCast", u); teles.Add(new Tele { x = pt2.x, y = pt2.y, r = u.key == "ta" ? 140 : 120, t = u.key == "lang" ? 0.55f : 0.95f, max = u.key == "lang" ? 0.55f : 0.95f, team = 1, kind = "mtele", col = D.col, src = u, dmg = 320, stun = u.key == "ta" ? 1.4f : 0, g = D.g });
         }
 
         void ChampAttack(Unit u, Body tg)
@@ -384,7 +384,7 @@ namespace PhamNhan.Sim
             if (over != null) return;
             if (!b.active)
             {
-                if (phase >= 2 && allies.Any(a => !a.dead && Dist(b, a) < 720)) { b.active = true; PushFeed("Huyết Sát Phó Tướng xuất trận"); ShowBanner("Trấn thủ xuất trận", "Huyết Sát Phó Tướng · Kết Đan sơ kỳ", 2.2f, "煞"); }
+                if (phase >= 2 && allies.Any(a => !a.dead && Dist(b, a) < 720)) { b.active = true; Snd("bossRoar", b); PushFeed("Huyết Sát Phó Tướng xuất trận"); ShowBanner("Trấn thủ xuất trận", "Huyết Sát Phó Tướng · Kết Đan sơ kỳ", 2.2f, "煞"); }
                 else return;
             }
             b.cd -= dt; b.cdT -= dt; b.cdK -= dt; b.moving = false;
@@ -392,8 +392,8 @@ namespace PhamNhan.Sim
             Unit tg = null; float bd = 900; foreach (var a in allies) { if (a.dead) continue; float d = Dist(b, a) * (a == hero ? 0.85f : 1); if (d < bd) { bd = d; tg = a; } }
             if (tg == null) tg = NearestEnemy(b, 900);
             if (tg == null) return;
-            if (tg.champ && b.cdK <= 0 && Dist(b, tg) < 420) { b.cdK = 15; zones.Add(new Zone { type = "khon", x = tg.x, y = tg.y, r = 165, t = 6, max = 6 }); PushFeed("Huyết Sát Phó Tướng bày Khốn Long Trận vây " + NameOf(tg)); if (tg == hero) Warn("Khốn Long Trận: độn thuật bị chặn trong vùng"); b.casting = 0.5f; b.anim = 0.5f; return; }
-            if (b.cdT <= 0 && Dist(b, tg) < 360) { b.cdT = 6; teles.Add(new Tele { x = tg.x, y = tg.y, r = 120, t = 1.15f, max = 1.15f, team = 1, kind = "tram", dmg = 620 }); b.casting = 0.7f; b.anim = 0.7f; b.face = Ang(b, tg); return; }
+            if (tg.champ && b.cdK <= 0 && Dist(b, tg) < 420) { b.cdK = 15; Snd("khon", tg); zones.Add(new Zone { type = "khon", x = tg.x, y = tg.y, r = 165, t = 6, max = 6 }); PushFeed("Huyết Sát Phó Tướng bày Khốn Long Trận vây " + NameOf(tg)); if (tg == hero) Warn("Khốn Long Trận: độn thuật bị chặn trong vùng"); b.casting = 0.5f; b.anim = 0.5f; return; }
+            if (b.cdT <= 0 && Dist(b, tg) < 360) { b.cdT = 6; Snd("bossCast", b); teles.Add(new Tele { x = tg.x, y = tg.y, r = 120, t = 1.15f, max = 1.15f, team = 1, kind = "tram", dmg = 620 }); b.casting = 0.7f; b.anim = 0.7f; b.face = Ang(b, tg); return; }
             float dd = Dist(b, tg) - tg.r - b.r;
             if (dd <= b.T.range)
             {
@@ -402,7 +402,7 @@ namespace PhamNhan.Sim
                 {
                     b.cd = 1.5f; b.anim = 0.3f;
                     for (int i = 0; i < units.Count; i++) { var e = units[i]; if (e.dead || e.team != 0) continue; if (Dist(b, e) - e.r < b.r + 52 && M.AngDiff(Ang(b, e), b.face) < 1.1f) Damage(e, e.champ ? 110 : R(30, 45), b); }
-                    fx.Add(new Fx { type = FxT.SlashR, x = b.x, y = b.y, a = b.face, t = 0.22f, max = 0.22f });
+                    Snd("bossSlash", b); fx.Add(new Fx { type = FxT.SlashR, x = b.x, y = b.y, a = b.face, t = 0.22f, max = 0.22f });
                 }
             }
             else MoveTo(b, tg, b.T.spd, dt);

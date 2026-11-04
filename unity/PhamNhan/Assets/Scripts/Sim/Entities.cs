@@ -74,5 +74,6 @@ namespace PhamNhan.Sim
     public class Strat { public float t, max; public string g, title, sub; public int side; }
     public class Plan { public string kind; public int tgt; public float t; public string why, g, title, sub; }
     public class FeedItem { public string s; public float t; }
+    public struct SndEv { public string id; public float x, y; }
     public class Building { public float x, y, rot, w, h, c, s, hw, hh; public string kind; public int v; }
 }

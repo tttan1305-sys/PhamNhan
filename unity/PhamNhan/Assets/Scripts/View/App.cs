@@ -20,7 +20,7 @@ namespace PhamNhan.View
         Screen_ scr = Screen_.Menu;
         Siege G; WorldView view; Camera cam;
         Vector2 camPos; float zoom = Z0;
-        bool autoMode; float menuT;
+        bool autoMode; float menuT; Sound snd;
 
         void Awake()
         {
@@ -33,6 +33,7 @@ namespace PhamNhan.View
             if (cam == null) { var go = new GameObject("Camera"); cam = go.AddComponent<Camera>(); go.tag = "MainCamera"; }
             cam.orthographic = true; cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = Shapes.Hex("#72bd55");
             cam.nearClipPlane = -100; cam.farClipPlane = 100; cam.transform.position = new Vector3(C.x, -C.y, -10);
+            snd = gameObject.AddComponent<Sound>();
             view = new WorldView(transform);
             G = new Siege(true); // trận nền cho màn hình chính: tự đánh
             G.intro = 0;
@@ -52,7 +53,7 @@ namespace PhamNhan.View
             float dt = Mathf.Min(1f / 30f, Time.deltaTime);
             if (scr == Screen_.Menu || scr == Screen_.Help)
             {
-                menuT += dt; G.Update(dt);
+                menuT += dt; G.Update(dt); G.snd.Clear(); snd.SetTrack(Sound.Track.Menu);
                 if (G.over != null && G.overT > 4) { G = new Siege(true); G.intro = 0; }
                 float a = menuT * 0.05f; var target = new Vector2(C.x + Mathf.Cos(a) * 500, C.y + Mathf.Sin(a) * 300);
                 camPos = Vector2.Lerp(camPos, target, dt); zoom = Mathf.Lerp(zoom, 0.32f, dt);
@@ -63,6 +64,7 @@ namespace PhamNhan.View
             float scale = (!G.AUTO && G.stratOn) ? 0.3f : 1f;
             G.Update(dt * scale);
             CamUpdate(dt);
+            PlaySounds();
         }
 
         void LateUpdate()
@@ -74,6 +76,19 @@ namespace PhamNhan.View
             cam.transform.position = new Vector3(camPos.x + off.x, -(camPos.y + off.y), -10);
             float vw = sz * 2 * cam.aspect, vh2 = sz * 2;
             view.Render(G, Time.time, strat || scr == Screen_.Menu || scr == Screen_.Help, new Rect(camPos.x - vw / 2, camPos.y - vh2 / 2, vw, vh2));
+        }
+
+        void PlaySounds()
+        {
+            float halfW = cam.orthographicSize * cam.aspect;
+            foreach (var e in G.snd)
+            {
+                float d = Vector2.Distance(camPos, new Vector2(e.x, e.y));
+                float near = Mathf.Clamp01(1 - (d - halfW * 0.7f) / (halfW * 1.3f));
+                snd.Play(e.id, near);
+            }
+            G.snd.Clear();
+            snd.SetTrack(G.over == "lose" ? Sound.Track.None : (G.phase >= 2 || G.boss.active) ? Sound.Track.Climax : Sound.Track.Battle);
         }
 
         bool StratView() { return G.intro > 4.7f || G.stratOn || (G.AUTO && G.strat != null); }
@@ -191,6 +206,7 @@ namespace PhamNhan.View
         void Press(string id)
         {
             if (scr != Screen_.Play && scr != Screen_.Pause && !id.StartsWith("menu_")) return;
+            if (id.StartsWith("m_") || id == "map" || id == "autob" || id == "pause" || id == "again" || id == "menu") snd.Play("tap");
             switch (id)
             {
                 case "yu": Manual(); G.CastYu(); break;
@@ -236,7 +252,7 @@ namespace PhamNhan.View
             Ui.Box(r, primary ? Ui.JADE : new Color(1, 1, 1, 0.92f));
             Ui.Text(r, label, 26, primary ? Color.white : Ui.INK, TextAnchor.MiddleCenter, true);
             var e = Event.current;
-            if ((e.type == EventType.MouseDown) && r.Contains(e.mousePosition)) { e.Use(); return true; }
+            if ((e.type == EventType.MouseDown) && r.Contains(e.mousePosition)) { e.Use(); snd.Play("tap"); return true; }
             return false;
         }
 
@@ -251,7 +267,23 @@ namespace PhamNhan.View
             if (MenuButton(new Rect(cx - 220, card.y + 160, 440, 74), "Vào trận", true)) StartGame(false);
             if (MenuButton(new Rect(cx - 220, card.y + 250, 440, 64), "Xem tự đánh", false)) StartGame(true);
             if (MenuButton(new Rect(cx - 220, card.y + 330, 440, 64), "Cách chơi", false)) scr = Screen_.Help;
-            Ui.Text(new Rect(card.x, card.y + 420, card.width, 60), "Bản thử nghiệm Unity 1 · giai đoạn 1 của game Phàm Nhân", 18, Ui.SUB, TextAnchor.MiddleCenter);
+            Ui.Text(new Rect(card.x, card.y + 420, card.width, 60), "Bản thử nghiệm Unity 2 · có âm thanh và nhạc nền", 18, Ui.SUB, TextAnchor.MiddleCenter);
+            SoundToggles(new Rect(sa.xMax - 300, sa.yMax - 64, 288, 52));
+        }
+
+        void SoundToggles(Rect r)
+        {
+            float w = (r.width - 8) / 2;
+            if (MenuButtonSmall(new Rect(r.x, r.y, w, r.height), snd.MusicOn ? "Nhạc: bật" : "Nhạc: tắt", snd.MusicOn)) snd.MusicOn = !snd.MusicOn;
+            if (MenuButtonSmall(new Rect(r.x + w + 8, r.y, w, r.height), snd.SfxOn ? "Âm thanh: bật" : "Âm thanh: tắt", snd.SfxOn)) snd.SfxOn = !snd.SfxOn;
+        }
+        bool MenuButtonSmall(Rect r, string label, bool on)
+        {
+            Ui.Box(r, on ? Ui.JADE : new Color(1, 1, 1, 0.92f));
+            Ui.Text(r, label, 18, on ? Color.white : Ui.INK, TextAnchor.MiddleCenter, true);
+            var e = Event.current;
+            if (e.type == EventType.MouseDown && r.Contains(e.mousePosition)) { e.Use(); snd.Play("tap"); return true; }
+            return false;
         }
 
         void DrawHelp(Rect sa)
@@ -273,11 +305,12 @@ namespace PhamNhan.View
         void DrawPause(Rect sa)
         {
             Ui.Fill(new Rect(0, 0, RW, 720), new Color(0.06f, 0.16f, 0.13f, 0.5f));
-            float cx = RW / 2; var card = new Rect(cx - 240, 160, 480, 400); Ui.Box(card, new Color(1, 1, 1, 0.95f));
+            float cx = RW / 2; var card = new Rect(cx - 240, 140, 480, 420); Ui.Box(card, new Color(1, 1, 1, 0.95f));
             Ui.Text(new Rect(card.x, card.y + 24, card.width, 50), "Tạm dừng", 34, Ui.INK, TextAnchor.MiddleCenter, true);
             if (MenuButton(new Rect(cx - 180, card.y + 100, 360, 64), "Tiếp tục", true)) scr = Screen_.Play;
             if (MenuButton(new Rect(cx - 180, card.y + 180, 360, 60), "Chơi lại", false)) StartGame(autoMode);
             if (MenuButton(new Rect(cx - 180, card.y + 256, 360, 60), "Về màn hình chính", false)) GoMenu();
+            SoundToggles(new Rect(cx - 180, card.y + 328, 360, 52));
         }
 
         void DrawWorldLabels()

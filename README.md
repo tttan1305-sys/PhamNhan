@@ -63,3 +63,5 @@ Video quay các bản (file `.mp4`, tổng khoảng 330 MB) không đưa lên re
 **Mở trong Unity**: thêm thư mục `unity/PhamNhan` vào Unity Hub rồi bấm Play. Trò chơi tự khởi động, không cần kéo thả gì vào cảnh.
 
 **Build tự động**: mỗi lần đẩy lên `main`, quy trình `.github/workflows/android.yml` build APK và đăng lên trang Releases, mục *ban-thu-nghiem*. Cần ba mục bí mật của repo là `UNITY_EMAIL`, `UNITY_PASSWORD`, `UNITY_LICENSE`; khi thiếu, quy trình bỏ qua bước build.
+
+**Âm thanh**: `Assets/Scripts/Audio/Synth.cs` tổng hợp 41 tiếng động và 3 bản nhạc nền (màn hình chính, trong trận, cao trào) bằng mã lúc mở game, không dùng file âm thanh. Lõi trận phát sự kiện qua `Siege.snd`, `View/Sound.cs` phát theo khoảng cách tới máy quay. Nút bật/tắt nhạc và âm thanh ở màn hình chính và khi tạm dừng.

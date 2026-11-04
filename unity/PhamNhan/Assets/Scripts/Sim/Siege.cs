@@ -43,6 +43,10 @@ namespace PhamNhan.Sim
         public List<FeedItem> feed = new List<FeedItem>();
         public List<FeedItem> log = new List<FeedItem>();
         public List<Building> builds = new List<Building>();
+        /// <summary>Sự kiện âm thanh cho tầng hiển thị; tầng hiển thị đọc rồi xoá mỗi khung hình.</summary>
+        public List<SndEv> snd = new List<SndEv>();
+        public void Snd(string id, float x, float y) { if (snd.Count < 64) snd.Add(new SndEv { id = id, x = x, y = y }); }
+        public void Snd(string id, Body b) { Snd(id, b.x, b.y); }
         Dictionary<int, List<Building>> bgrid = new Dictionary<int, List<Building>>();
         const float BC = 128;
 
@@ -63,7 +67,7 @@ namespace PhamNhan.Sim
         public static float AngC(Body b) { return AngC(b.x, b.y); }
 
         public void PushFeed(string s) { feed.Add(new FeedItem { s = s, t = t }); log.Add(new FeedItem { s = s, t = t }); if (feed.Count > 6) feed.RemoveAt(0); }
-        public void ShowBanner(string title, string sub, float d, string g) { banner = new Banner { t = d, max = d, title = title, sub = sub ?? "", g = g }; }
+        public void ShowBanner(string title, string sub, float d, string g) { Snd("banner", C.x, C.y); banner = new Banner { t = d, max = d, title = title, sub = sub ?? "", g = g }; }
         public void Warn(string s) { warnS = s; warnT = 3.5f; }
         public void FloatT(float x, float y, string s, Rgb col, float size)
         {
@@ -209,7 +213,7 @@ namespace PhamNhan.Sim
         {
             rng = new Rng(20261102);
             t = 0; time = TIME; phase = 1; barrier = true; sec = new bool[4]; open = -1;
-            units.Clear(); eyes.Clear(); proj.Clear(); fx.Clear(); decals.Clear(); floats.Clear(); zones.Clear(); teles.Clear(); ripples.Clear(); waves.Clear(); feed.Clear(); log.Clear();
+            snd.Clear(); units.Clear(); eyes.Clear(); proj.Clear(); fx.Clear(); decals.Clear(); floats.Clear(); zones.Clear(); teles.Clear(); ripples.Clear(); waves.Clear(); feed.Clear(); log.Clear();
             banner = null; warnS = null; warnT = 0; shake = 0; flashA = 0; killed = 0; totalEnemy = 0; lost = 0; flag = 0; contested = false; over = null; overT = 0;
             mode = "auto"; plan = null; cmdT = 3; mcmdT = 2; strat = null; lastStrat = -99; stratOn = false; nid = 1; lastHeroFeed = -9; intro = INTRO;
             pha = 3; dan = 3; loi = 5; an = 3; anT = 0; loiT = 0; hoCd = 0; phaCd = 0; danCd = 0; anCd = 0; breakT = -1; breakD = -1; flagOwner = 1; heroKills = 0; maDown = 0; castN = 0; veinGlow = 0;
@@ -412,6 +416,7 @@ namespace PhamNhan.Sim
             else if (u.champ) amt *= 0.8f;
             if (u.team == 0 && InZone(u, "ho") != null) amt *= 0.7f;
             u.hp -= amt; u.flash = 0.09f; u.hitT = t;
+            if (src == hero || u == hero) Snd(o.crit ? "crit" : "hit", u); else if (u.champ || u == boss) Snd("hitC", u);
             if (src == hero || o.show) FloatT(u.x + R(-8, 8), u.y - u.r * 2 - 6, (o.crit ? "Bạo kích " : "") + "-" + M.Fmt(amt), o.crit ? Rgb.Hex("#ffd36b") : new Rgb(255, 255, 255), o.crit ? 18 : (u == boss || u.champ ? 16 : 13));
             else if (u == hero) FloatT(u.x + R(-8, 8), u.y - 40, "-" + M.Fmt(amt), Rgb.Hex("#ff7a6b"), 14);
             else if (u.champ && amt >= 120) FloatT(u.x + R(-8, 8), u.y - 44, "-" + M.Fmt(amt), u.team == 1 ? Rgb.Hex("#ffd0c0") : Rgb.Hex("#ffb0a0"), 13);
@@ -428,7 +433,7 @@ namespace PhamNhan.Sim
                 if (el != Elem.None && (el == e.weak || el == Elem.Pha))
                 {
                     if (o.cast >= 0 && e.lastCast == o.cast) return; e.lastCast = o.cast;
-                    e.seals--; e.flash = 0.25f;
+                    e.seals--; e.flash = 0.25f; Snd("seal", e);
                     Glyph(ELEM[el].g, e.x, e.y - 150, 1, ELEM[el].col);
                     RingFx(e.x, e.y - 50, 20, 120, 0.5f, E.col); Sparks(e.x, e.y - 60, E.col, 22); Shake(Dist(hero, e) < 800 ? 8 : 0);
                     FloatT(e.x, e.y - 178, (el == Elem.Pha ? "Phá Trận Phù phá 1 ấn" : (src != null && src != hero ? NameOf(src) + ": " : "") + ELEM[el].n + " khắc " + E.n + ", phá 1 ấn") + (e.seals > 0 ? " · còn " + e.seals : ""), Rgb.Hex("#ffd36b"), 16);
@@ -442,13 +447,13 @@ namespace PhamNhan.Sim
                 }
                 else if (src == hero)
                 {
-                    if (t - e.vainT > 0.9f) { e.vainT = t; FloatT(e.x, e.y - 178, "Vô hiệu · cần " + ELEM[e.weak].n + " khắc " + E.n, Rgb.Hex("#c9c0b0"), 14); RingFx(e.x, e.y - 50, 40, 70, 0.3f, new Rgb(200, 200, 200)); }
+                    if (t - e.vainT > 0.9f) { e.vainT = t; Snd("vain", e); FloatT(e.x, e.y - 178, "Vô hiệu · cần " + ELEM[e.weak].n + " khắc " + E.n, Rgb.Hex("#c9c0b0"), 14); RingFx(e.x, e.y - 50, 40, 70, 0.3f, new Rgb(200, 200, 200)); }
                 }
                 return;
             }
             if (e.vuln <= 0) return;
             if (src != null && src != hero && !src.champ && src.t != "quy") amt *= 0.35f;
-            e.hp -= amt; e.flash = 0.1f; e.lastHit = t;
+            e.hp -= amt; e.flash = 0.1f; e.lastHit = t; Snd("eyeHit", e);
             if (src == hero || o.show) FloatT(e.x + R(-12, 12), e.y - 150, M.Fmt(amt), o.crit ? Rgb.Hex("#ffd36b") : Rgb.Hex("#f3d9a0"), o.crit ? 20 : 15);
             if (e.hp <= 0) EyeDown(e, src);
         }
@@ -457,13 +462,13 @@ namespace PhamNhan.Sim
         {
             if (u.dead) return; u.dead = true; u.hp = 0;
             Splat(u.x, u.y, u.team, u.r);
-            if (u == hero) { hero.respawn = 6; PushFeed("Ngao Thiên trọng thương, lui về hậu phương"); return; }
+            if (u == hero) { Snd("heroDown", u); hero.respawn = 6; PushFeed("Ngao Thiên trọng thương, lui về hậu phương"); return; }
             if (u.champ)
             {
-                if (u.team == 0) { u.respawn = 12; u.retreat = false; PushFeed(NameOf(u) + " trọng thương, lui về doanh trại"); }
+                if (u.team == 0) { Snd("allyDown", u); u.respawn = 12; u.retreat = false; PushFeed(NameOf(u) + " trọng thương, lui về doanh trại"); }
                 else
                 {
-                    maDown++; PushFeed(SrcName(src) + " hạ " + NameOf(u));
+                    Snd("foeDown", u); maDown++; PushFeed(SrcName(src) + " hạ " + NameOf(u));
                     ShowBanner(NameOf(u) + " đã ngã", u.D.sect + " mất một tướng trấn giữ", 2.4f, u.D.g);
                     Boom(u.x, u.y, u.D.col, 40, 220); Shake(Dist(hero, u) < 700 ? 12 : 0); mcmdT = M.Min(mcmdT, 0.5f);
                 }
@@ -483,7 +488,7 @@ namespace PhamNhan.Sim
             if (e.revealed) return; e.revealed = true; e.shock = 3.5f; warnT = 0; var E = ELEM[e.el]; var W = ELEM[e.weak];
             bool near = Dist(hero, e) < 1500;
             if (near) { Flash(0.3f, E.col); Shake(12); }
-            Boom(e.x, e.y - 40, E.col, 40, 260);
+            Boom(e.x, e.y - 40, E.col, 40, 260); Snd("reveal", e);
             Glyph(E.g, e.x, e.y - 120, 1.2f, E.col);
             if (near) ShowBanner("Trận nhãn " + E.n + " hiện hình", e.maxSeals + " ấn " + E.n + " bảo hộ · " + W.n + " khắc " + E.n + ": " + e.toolT, 3.2f, E.g);
             PushFeed(SrcName(by) + " soi ra trận nhãn " + E.n + " ở " + e.place);
@@ -502,7 +507,7 @@ namespace PhamNhan.Sim
         {
             if (e.dead) return; e.dead = true; e.hp = 0; e.vuln = 0; warnT = 0; var E = ELEM[e.el]; int d = e.i;
             PushFeed(SrcName(src) + " phá trận nhãn " + E.n + " hướng " + DIRS[d].n);
-            Shake(Dist(hero, e) < 1500 ? 18 : 6); Flash(0.35f, E.col); Boom(e.x, e.y - 40, E.col, 50, 300);
+            Snd("eyeDown", e); Shake(Dist(hero, e) < 1500 ? 18 : 6); Flash(0.35f, E.col); Boom(e.x, e.y - 40, E.col, 50, 300);
             decals.Add(new Decal { x = e.x, y = e.y, r = 52, t = 999, type = "crater" }); ripples.Add(new Ripple { a = e.va, t = 0, big = true });
             sec[d] = true; breakT = 0; breakD = d;
             if (open < 0) open = d; else ShowBanner("Cung kết giới hướng " + DIRS[d].n + " sụp", "Thêm một cửa vào thành", 2.4f, "破");
@@ -514,7 +519,7 @@ namespace PhamNhan.Sim
         {
             PushFeed(SrcName(src) + " chém hạ Huyết Sát Phó Tướng");
             ShowBanner("Trấn thủ đã ngã", "Quân Ma đạo rối loạn, thủ quân mất ý chí", 3, "煞");
-            shake = 20; Flash(0.5f, new Rgb(255, 210, 150)); Boom(boss.x, boss.y, new Rgb(229, 96, 77), 70, 420);
+            Snd("eyeDown", boss); shake = 20; Flash(0.5f, new Rgb(255, 210, 150)); Boom(boss.x, boss.y, new Rgb(229, 96, 77), 70, 420);
             foreach (var u in units) if (!u.dead && u.team == 1 && Dist(u, boss) < 600) u.stun = M.Max(u.stun, 1.5f);
         }
 
@@ -525,7 +530,7 @@ namespace PhamNhan.Sim
             if (strat != null) { strat.t -= dt; if (strat.t <= 0) strat = null; }
             if (intro > 0) { intro -= dt; UpdateFx(dt); return; }
             if (over != null) overT += dt;
-            else { time -= dt; if (time <= 0) { time = 0; over = "lose"; overT = 0; ShowBanner("Hết giờ", "Thủ quân Phù Vân Thành giữ được thành", 4, null); } }
+            else { time -= dt; if (time <= 0) { time = 0; Snd("lose", C.x, C.y); over = "lose"; overT = 0; ShowBanner("Hết giờ", "Thủ quân Phù Vân Thành giữ được thành", 4, null); } }
             if (AUTO) Autopilot();
             hoCd -= dt; phaCd -= dt; danCd -= dt; anCd -= dt;
             if (an < 3) { anT += dt; if (anT >= 20) { anT = 0; an++; } } else anT = 0;
@@ -552,7 +557,7 @@ namespace PhamNhan.Sim
                 {
                     f.hit = true;
                     for (int i = 0; i < units.Count; i++) { var e = units[i]; if (e.dead || e.team != 1) continue; if (M.Dist(e.x, e.y, f.x, f.y) < 44 + e.r) Damage(e, R(80, 105), hero, new HitOpt { crit = Rnd() < 0.12f }); }
-                    Sparks(f.x, f.y, new Rgb(243, 217, 160), 5); RingFx(f.x, f.y, 6, 46, 0.25f, new Rgb(243, 217, 160)); Shake(3);
+                    Snd("fall", f.x, f.y); Sparks(f.x, f.y, new Rgb(243, 217, 160), 5); RingFx(f.x, f.y, 6, 46, 0.25f, new Rgb(243, 217, 160)); Shake(3);
                 }
             }
             fx.RemoveAll(f => f.t <= 0); if (fx.Count > 900) fx.RemoveRange(0, fx.Count - 900);
@@ -645,7 +650,7 @@ namespace PhamNhan.Sim
                 if (inZ && !contested) { int al = CountEnemies(C, FLAG_R + 30, 0); flag += dt * (al >= 5 ? 1.25f : 1); }
                 if (flag >= flagNeed)
                 {
-                    over = "win"; overT = 0; flagOwner = 0; Flash(0.8f, new Rgb(243, 217, 160));
+                    Snd("win", C.x, C.y); over = "win"; overT = 0; flagOwner = 0; Flash(0.8f, new Rgb(243, 217, 160));
                     ShowBanner("Công phá Phù Vân Thành", "Cờ Chính đạo tung bay trên đài trung tâm", 3.6f, "捷"); PushFeed("Phù Vân Thành về tay Chính đạo");
                     foreach (var u in units) if (!u.dead && u.team == 1) u.stun = 99;
                 }
