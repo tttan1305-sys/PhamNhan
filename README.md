@@ -65,3 +65,5 @@ Video quay các bản (file `.mp4`, tổng khoảng 330 MB) không đưa lên re
 **Build tự động**: mỗi lần đẩy lên `main`, quy trình `.github/workflows/android.yml` build APK và đăng lên trang Releases, mục *ban-thu-nghiem*. Cần ba mục bí mật của repo là `UNITY_EMAIL`, `UNITY_PASSWORD`, `UNITY_LICENSE`; khi thiếu, quy trình bỏ qua bước build.
 
 **Âm thanh**: `Assets/Scripts/Audio/Synth.cs` tổng hợp 41 tiếng động và 3 bản nhạc nền (màn hình chính, trong trận, cao trào) bằng mã lúc mở game, không dùng file âm thanh. Lõi trận phát sự kiện qua `Siege.snd`, `View/Sound.cs` phát theo khoảng cách tới máy quay. Nút bật/tắt nhạc và âm thanh ở màn hình chính và khi tạm dừng.
+
+**Tạo hình nhân vật**: `Assets/Scripts/Art/` vẽ 10 tướng và 8 binh chủng bằng mã (C# thuần, không dùng file ảnh). Mỗi loại có 4 khung: đứng, hai bước đi, ra đòn. Ảnh dựng ở luồng phụ lúc mở game (`View/CharSprites.cs`). Màn hình chính có mục **Nhân vật** để xem từng tạo hình. Xem thử không cần Unity: `dotnet run --project unity/ArtTest -- bang.png 160` ghi bảng tạo hình ra PNG.

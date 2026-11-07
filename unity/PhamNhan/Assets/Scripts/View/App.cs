@@ -7,7 +7,7 @@ using static PhamNhan.Sim.Defs;
 namespace PhamNhan.View
 {
     /// <summary>Điều khiển toàn bộ trò chơi: màn hình chính, trận đấu, máy quay, cảm ứng và giao diện.</summary>
-    public class App : MonoBehaviour
+    public partial class App : MonoBehaviour
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot()
@@ -16,7 +16,7 @@ namespace PhamNhan.View
             new GameObject("PhamNhan").AddComponent<App>();
         }
 
-        enum Screen_ { Menu, Help, Play, Pause }
+        enum Screen_ { Menu, Help, Play, Pause, Roster }
         Screen_ scr = Screen_.Menu;
         Siege G; WorldView view; Camera cam;
         Vector2 camPos; float zoom = Z0;
@@ -28,7 +28,7 @@ namespace PhamNhan.View
             UnityEngine.Screen.sleepTimeout = SleepTimeout.NeverSleep;
             UnityEngine.Screen.orientation = ScreenOrientation.LandscapeLeft;
             Input.multiTouchEnabled = true;
-            Shapes.Init(); Ui.Init();
+            Shapes.Init(); Ui.Init(); CharSprites.Begin();
             cam = Camera.main;
             if (cam == null) { var go = new GameObject("Camera"); cam = go.AddComponent<Camera>(); go.tag = "MainCamera"; }
             cam.orthographic = true; cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = Shapes.Hex("#72bd55");
@@ -51,7 +51,8 @@ namespace PhamNhan.View
         void Update()
         {
             float dt = Mathf.Min(1f / 30f, Time.deltaTime);
-            if (scr == Screen_.Menu || scr == Screen_.Help)
+            CharSprites.Poll();
+            if (scr == Screen_.Menu || scr == Screen_.Help || scr == Screen_.Roster)
             {
                 menuT += dt; G.Update(dt); G.snd.Clear(); snd.SetTrack(Sound.Track.Menu);
                 if (G.over != null && G.overT > 4) { G = new Siege(true); G.intro = 0; }
@@ -75,7 +76,7 @@ namespace PhamNhan.View
             float sh = G.shake * 0.6f; var off = sh > 0.3f ? Random.insideUnitCircle * sh : Vector2.zero;
             cam.transform.position = new Vector3(camPos.x + off.x, -(camPos.y + off.y), -10);
             float vw = sz * 2 * cam.aspect, vh2 = sz * 2;
-            view.Render(G, Time.time, strat || scr == Screen_.Menu || scr == Screen_.Help, new Rect(camPos.x - vw / 2, camPos.y - vh2 / 2, vw, vh2));
+            view.Render(G, Time.time, strat || scr == Screen_.Menu || scr == Screen_.Help || scr == Screen_.Roster, new Rect(camPos.x - vw / 2, camPos.y - vh2 / 2, vw, vh2));
         }
 
         void PlaySounds()
@@ -242,6 +243,7 @@ namespace PhamNhan.View
             {
                 case Screen_.Menu: DrawMenu(sa); break;
                 case Screen_.Help: DrawHelp(sa); break;
+                case Screen_.Roster: DrawRoster(sa); break;
                 default: DrawWorldLabels(); DrawHud(sa); if (scr == Screen_.Pause) DrawPause(sa); break;
             }
             // nút trên màn hình chính, trợ giúp, tạm dừng dùng sự kiện chuột/chạm IMGUI
@@ -264,10 +266,11 @@ namespace PhamNhan.View
             Ui.Box(card, new Color(1, 1, 1, 0.9f));
             Ui.Text(new Rect(card.x, card.y + 30, card.width, 70), "PHÀM NHÂN", 56, Ui.INK, TextAnchor.MiddleCenter, true);
             Ui.Text(new Rect(card.x, card.y + 98, card.width, 30), "Công thành Phù Vân · năm tướng đấu năm tướng", 22, Ui.SUB, TextAnchor.MiddleCenter);
-            if (MenuButton(new Rect(cx - 220, card.y + 160, 440, 74), "Vào trận", true)) StartGame(false);
-            if (MenuButton(new Rect(cx - 220, card.y + 250, 440, 64), "Xem tự đánh", false)) StartGame(true);
-            if (MenuButton(new Rect(cx - 220, card.y + 330, 440, 64), "Cách chơi", false)) scr = Screen_.Help;
-            Ui.Text(new Rect(card.x, card.y + 420, card.width, 60), "Bản thử nghiệm Unity 2 · có âm thanh và nhạc nền", 18, Ui.SUB, TextAnchor.MiddleCenter);
+            if (MenuButton(new Rect(cx - 220, card.y + 150, 440, 74), "Vào trận", true)) StartGame(false);
+            if (MenuButton(new Rect(cx - 220, card.y + 238, 440, 62), "Nhân vật", false)) { scr = Screen_.Roster; rosterT = 0; }
+            if (MenuButton(new Rect(cx - 220, card.y + 312, 216, 62), "Xem tự đánh", false)) StartGame(true);
+            if (MenuButton(new Rect(cx + 4, card.y + 312, 216, 62), "Cách chơi", false)) scr = Screen_.Help;
+            Ui.Text(new Rect(card.x, card.y + 410, card.width, 60), "Bản thử nghiệm Unity 3 · thêm tạo hình nhân vật", 18, Ui.SUB, TextAnchor.MiddleCenter);
             SoundToggles(new Rect(sa.xMax - 300, sa.yMax - 64, 288, 52));
         }
 
@@ -324,6 +327,12 @@ namespace PhamNhan.View
                 if (u.dead || !(u.champ || u == G.boss)) continue;
                 var p = W2G(u.x, u.y);
                 if (p.x < -60 || p.x > RW + 60 || p.y < -60 || p.y > 780) continue;
+                if (!strat && CharSprites.Get(u.t) != null)
+                {
+                    var sp = CharSprites.Get(u.t).spec; var tp = W2G(u.x, u.y + u.r * 0.55f - u.r * WorldView.Side(u.t) * (sp.ax1 - sp.ax0) / 120f * 0.92f);
+                    if (px > 0.5f) Ui.Text(new Rect(tp.x - 90, tp.y - 26, 180, 20), u == G.hero ? "Ngao Thiên (bạn)" : u.T.name, 12, Color.white, TextAnchor.LowerCenter, true, false, true);
+                    continue;
+                }
                 float rr = Mathf.Max(9, u.r * 1.2f * px * (strat ? 3.2f : 1));
                 Ui.Text(new Rect(p.x - 40, p.y - rr - 2, 80, rr * 2), u.D.g, Mathf.RoundToInt(rr * 1.35f), Color.white, TextAnchor.MiddleCenter, true, false, true);
                 if (strat || px > 0.5f) Ui.Text(new Rect(p.x - 90, p.y + rr + (strat ? 4 : 10), 180, 22), u == G.hero ? "Ngao Thiên (bạn)" : u.T.name, strat ? 15 : 13, Color.white, TextAnchor.UpperCenter, true, false, true);
@@ -414,7 +423,7 @@ namespace PhamNhan.View
             for (int i = 0; i < 5; i++)
             {
                 var a = g.allies[i]; float y = team.y + 28 + i * 23;
-                Ui.Text(new Rect(team.x + 10, y - 2, 22, 22), a.D.g, 16, Shapes.C(a.D.col), TextAnchor.UpperCenter, true);
+                if (!Portrait(new Rect(team.x + 9, y - 3, 24, 24), a.t, a.dead)) Ui.Text(new Rect(team.x + 10, y - 2, 22, 22), a.D.g, 16, Shapes.C(a.D.col), TextAnchor.UpperCenter, true);
                 Ui.Text(new Rect(team.x + 36, y, 120, 18), a == h ? "Ngao Thiên (bạn)" : a.T.name, 13, a.dead ? Ui.SUB : Ui.INK, TextAnchor.UpperLeft, true);
                 string where = a.dead ? "hồi " + Mathf.CeilToInt(a.respawn) + "s" : a.asg >= 0 ? "→ " + DIRS[a.asg].n : g.open >= 0 ? "→ cửa " + DIRS[g.open].n : "";
                 Ui.Text(new Rect(team.xMax - 82, y, 72, 18), where, 12, Ui.SUB, TextAnchor.UpperRight);
@@ -431,7 +440,7 @@ namespace PhamNhan.View
             for (int i = 0; i < 5; i++)
             {
                 var m = g.foes[i]; float y = foe.y + 28 + i * 22;
-                Ui.Text(new Rect(foe.x + 8, y - 2, 22, 22), m.D.g, 15, Shapes.C(m.D.col), TextAnchor.UpperCenter, true);
+                if (!Portrait(new Rect(foe.x + 7, y - 3, 24, 24), m.t, m.dead)) Ui.Text(new Rect(foe.x + 8, y - 2, 22, 22), m.D.g, 15, Shapes.C(m.D.col), TextAnchor.UpperCenter, true);
                 Ui.Text(new Rect(foe.x + 32, y, 120, 18), m.T.name, 12, m.dead ? Ui.SUB : Ui.INK, TextAnchor.UpperLeft, true);
                 string where = m.dead ? "đã ngã" : m == g.boss ? (m.active ? "xuất trận" : "nội thành") : m.asg == Unit.BREACH ? "giữ cửa" : m.asg >= 0 ? DIRS[m.asg].n : "";
                 Ui.Text(new Rect(foe.xMax - 78, y, 70, 18), where, 11, Ui.SUB, TextAnchor.UpperRight);

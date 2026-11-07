@@ -1,0 +1,15 @@
+/home/claude/phamnhan/unity/ArtTest/bin/Debug/net8.0/ArtTest
+/home/claude/phamnhan/unity/ArtTest/bin/Debug/net8.0/ArtTest.deps.json
+/home/claude/phamnhan/unity/ArtTest/bin/Debug/net8.0/ArtTest.runtimeconfig.json
+/home/claude/phamnhan/unity/ArtTest/bin/Debug/net8.0/ArtTest.dll
+/home/claude/phamnhan/unity/ArtTest/bin/Debug/net8.0/ArtTest.pdb
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.GeneratedMSBuildEditorConfig.editorconfig
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.AssemblyInfoInputs.cache
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.AssemblyInfo.cs
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.csproj.CoreCompileInputs.cache
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.sourcelink.json
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.dll
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/refint/ArtTest.dll
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.pdb
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ArtTest.genruntimeconfig.cache
+/home/claude/phamnhan/unity/ArtTest/obj/Debug/net8.0/ref/ArtTest.dll

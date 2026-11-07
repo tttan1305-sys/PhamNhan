@@ -10,7 +10,7 @@ namespace PhamNhan.View
     {
         // bảng màu sáng hiện đại (theo bản 5–7)
         public static readonly Color ALLY = Shapes.Hex("#2f8fe0"), FOE = Shapes.Hex("#e5483d"), JADE = Shapes.Hex("#10a37f"), GOLD = Shapes.Hex("#f3c64a");
-        const int O_DECAL = 2, O_ZONE = 3, O_BUILD = 5, O_UNIT = 10, O_TREE = 30, O_FX = 40, O_TOP = 60;
+        const int O_DECAL = 2, O_ZONE = 3, O_BUILD = 5, O_UNIT = 10, O_TREE = 30, O_U = 100, O_FX = 4200, O_TOP = 4300; // O_U: quân xếp lớp theo y, mỗi bậc 4 lớp
 
         readonly Transform root;
         public Painter P;
@@ -184,6 +184,7 @@ namespace PhamNhan.View
 
         public void Render(Siege g, float time, bool strat, Rect view)
         {
+            if (g != G) faceLeft.Clear();
             G = g; P.Begin(); vx0 = view.xMin; vy0 = view.yMin; vx1 = view.xMax; vy1 = view.yMax;
             float big = strat ? 3.2f : 1f; // phóng to biểu tượng khi xem sa bàn
 
@@ -232,8 +233,8 @@ namespace PhamNhan.View
 
             // cờ
             if (g.phase == 3) { float k = g.flag / g.flagNeed; P.Arc(C.x, C.y, FLAG_R + 18, -M.PI / 2, -M.PI / 2 + M.TAU * k, 10, ALLY, O_ZONE + 3); }
-            P.Rect(C.x, C.y - 40, 5, 80, Shapes.Hex("#6a5a40"), O_UNIT + 500);
-            P.Rect(C.x + 22, C.y - 66, 40, 26, g.flagOwner == 0 ? ALLY : FOE, O_UNIT + 501);
+            P.Rect(C.x, C.y - 40, 5, 80, Shapes.Hex("#6a5a40"), Ord(C.y) + 2);
+            P.Rect(C.x + 22, C.y - 66, 40, 26, g.flagOwner == 0 ? ALLY : FOE, Ord(C.y) + 3);
 
             // trận nhãn
             foreach (var e in g.eyes)
@@ -254,7 +255,9 @@ namespace PhamNhan.View
                 float r = u.r * (u.champ || u == g.boss ? big : (strat ? 1.8f : 1));
                 bool ally = u.team == 0;
                 float yo = u.rise > 0 ? u.rise * 12 : 0;
-                int ord = O_UNIT + 2 + Mathf.Clamp((int)(u.y / 30f), 0, 220);
+                int ord = strat ? O_U + 2 + Mathf.Clamp((int)(u.y / 30f), 0, 220) : Ord(u.y);
+                var cs = strat ? null : CharSprites.Get(u.t);
+                if (cs != null) { DrawChar(g, u, cs, r, ally, yo, ord, time); continue; }
                 P.Glow(u.x + 2, u.y + r * 0.45f, r * 1.2f, new Color(0, 0, 0, 0.22f), ord - 1);
                 if (u.champ || u == g.boss)
                 {
@@ -310,6 +313,57 @@ namespace PhamNhan.View
                 }
             }
             P.End();
+        }
+
+        static int Ord(float y) { return O_U + Mathf.Clamp((int)(y / 6f), 0, 1000) * 4; }
+
+        // hướng nhìn từng quân (có trễ để không lật qua lật lại)
+        readonly Dictionary<int, bool> faceLeft = new Dictionary<int, bool>();
+        static readonly int[] WALK = { 1, 0, 2, 0 };
+
+        /// <summary>Hệ số cạnh ảnh so với bán kính va chạm của quân.</summary>
+        public static float Side(string t)
+        {
+            switch (t)
+            {
+                case "boss": return 5.2f;
+                case "quy": return 5.6f;
+                case "loan": return 5.4f;
+                case "hero": case "viem": case "thach": case "nguyet": case "thanh": case "lang": case "thi": case "bo": case "ta": return 5.6f;
+                default: return 5.2f;
+            }
+        }
+
+        void DrawChar(Siege g, Unit u, CharSprites.Set cs, float r, bool ally, float yo, int ord, float time)
+        {
+            bool big = u.champ || u == g.boss;
+            float side = u.r * Side(u.t) * (cs.spec.ax1 - cs.spec.ax0) / 120f, feet = u.y + u.r * 0.55f;
+            float cf = Mathf.Cos(u.face); bool left;
+            if (!faceLeft.TryGetValue(u.id, out left)) left = cf < 0;
+            if (cf < -0.2f) left = true; else if (cf > 0.2f) left = false;
+            faceLeft[u.id] = left;
+            int fr = (u.anim > 0 || (u == g.hero && g.hero.swing > 0) || u.casting > 0) ? 3 : u.moving ? WALK[(int)(time * 7.5f + u.id * 0.37f) & 3] : 0;
+            float breath = fr == 0 ? 1 + 0.018f * Mathf.Sin(time * 2.6f + u.id) : 1;
+            float cx = u.x + (left ? -cs.cx : cs.cx) * side, cy = feet - yo - cs.cy * side * breath;
+            // bóng và vòng phe dưới chân
+            P.Draw(Shapes.Soft, u.x + 2, feet, side * 0.5f, side * 0.17f, new Color(0, 0, 0, 0.3f), ord);
+            if (big)
+            {
+                Color ring = u == g.hero ? GOLD : ally ? ALLY : FOE;
+                P.Draw(Shapes.Ring, u.x, feet, side * 0.52f, side * 0.2f, ring, ord + 1);
+            }
+            else P.Draw(Shapes.Ring, u.x, feet, side * 0.42f, side * 0.15f, A(ally ? ALLY : FOE, 0.55f), ord + 1);
+            Color tint = u.retreat ? new Color(1, 1, 1, 0.8f) : Color.white;
+            P.Draw(cs.f[fr], cx, cy, left ? -side : side, side * breath, tint, ord + 2);
+            if (u.flash > 0) P.Draw(cs.m[fr], cx, cy, left ? -side : side, side * breath, new Color(1, 1, 1, Mathf.Clamp01(u.flash * 7) * 0.85f), ord + 3);
+            float top = feet - side * (big ? 0.92f : 0.82f) - yo;
+            if (big)
+            {
+                if (u.stun > 0 && u.stun < 50) P.RingAt(u.x, top - 8, r * 0.7f, new Color(1, 0.95f, 0.5f, 0.9f), O_FX);
+                if (u.retreat) P.RingAt(u.x, feet, r * 1.9f, new Color(1, 1, 1, 0.5f), ord + 1);
+                Bar(u.x, top, 54, 6, u.hp / u.max, ally ? Shapes.Hex("#1e9b4f") : FOE);
+            }
+            else if (u.hp < u.max && u.T.hp >= 200) Bar(u.x, top, 26, 4, u.hp / u.max, ally ? Shapes.Hex("#1e9b4f") : FOE);
         }
 
         void Bar(float x, float y, float w, float h, float k, Color c)
