@@ -48,3 +48,22 @@ Script chạy lần lượt ba bước:
 3. `v6/icons.py` thêm biểu tượng chiêu thức và sửa bố cục chữ.
 
 Video quay các bản (file `.mp4`, tổng khoảng 330 MB) không đưa lên repo vì quá nặng.
+
+## Bản Unity (giai đoạn 1)
+
+`unity/PhamNhan/` là dự án Unity 6 (6000.0.84f1). Giai đoạn 1 chuyển màn công thành sang C# để chơi trên điện thoại Android, có điều khiển cảm ứng.
+
+| Đường dẫn | Nội dung |
+|---|---|
+| `Assets/Scripts/Sim/` | Lõi mô phỏng trận bằng C# thuần, không phụ thuộc Unity: quân, tướng, quân sư AI, trận nhãn, kết giới, chiêu thức. |
+| `Assets/Scripts/View/` | Phần Unity: vẽ chiến trường, máy quay, giao diện, cần gạt và nút cảm ứng, màn hình chính. |
+| `Assets/Editor/BuildScript.cs` | Menu **Phàm Nhân → Build Android APK**, cũng là hàm GitHub Actions gọi để build. |
+| `unity/SimTest/` | Chạy thử trận ở chế độ tự đánh không cần Unity: `dotnet run --project unity/SimTest -- 900`. |
+
+**Mở trong Unity**: thêm thư mục `unity/PhamNhan` vào Unity Hub rồi bấm Play. Trò chơi tự khởi động, không cần kéo thả gì vào cảnh.
+
+**Build tự động**: mỗi lần đẩy lên `main`, quy trình `.github/workflows/android.yml` build APK và đăng lên trang Releases, mục *ban-thu-nghiem*. Cần ba mục bí mật của repo là `UNITY_EMAIL`, `UNITY_PASSWORD`, `UNITY_LICENSE`; khi thiếu, quy trình bỏ qua bước build.
+
+**Âm thanh**: `Assets/Scripts/Audio/Synth.cs` tổng hợp 41 tiếng động và 3 bản nhạc nền (màn hình chính, trong trận, cao trào) bằng mã lúc mở game, không dùng file âm thanh. Lõi trận phát sự kiện qua `Siege.snd`, `View/Sound.cs` phát theo khoảng cách tới máy quay. Nút bật/tắt nhạc và âm thanh ở màn hình chính và khi tạm dừng.
+
+**Tạo hình nhân vật**: `Assets/Scripts/Art/` vẽ 10 tướng và 8 binh chủng bằng mã (C# thuần, không dùng file ảnh). Mỗi loại có 4 khung: đứng, hai bước đi, ra đòn. Ảnh dựng ở luồng phụ lúc mở game (`View/CharSprites.cs`). Màn hình chính có mục **Nhân vật** để xem từng tạo hình. Xem thử không cần Unity: `dotnet run --project unity/ArtTest -- bang.png 160` ghi bảng tạo hình ra PNG.
