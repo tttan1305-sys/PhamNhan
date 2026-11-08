@@ -53,7 +53,9 @@ namespace PhamNhan.Sim
         public Unit hero, boss;
         public Unit[] allies, foes;
 
-        public Siege(bool auto) { AUTO = auto; GenWorld(); NewGame(); }
+        public BattleCfg cfg = new BattleCfg();
+        public Siege(bool auto, BattleCfg c = null) { AUTO = auto; if (c != null) cfg = c; GenWorld(); NewGame(); }
+        public string Name { get { return cfg.name; } }
 
         // ================= tiện ích =================
         public static float Dist(Body a, Body b) { return M.Dist(a.x, a.y, b.x, b.y); }
@@ -174,7 +176,8 @@ namespace PhamNhan.Sim
         Unit AddUnit(string ty, float x, float y)
         {
             var T = TYPES[ty];
-            var u = new Unit { id = nid++, t = ty, T = T, team = T.team, x = x, y = y, hp = T.hp, max = T.hp, cd = Rnd() * (T.cd > 0 ? T.cd : 1), face = T.team == 1 ? M.PI : 0, retgt = Rnd() * 0.3f, r = T.r, ox = R(-70, 70), oy = R(-70, 70), steer = Rnd() < 0.5f ? 1 : -1 };
+            float hk = T.team == 1 ? (ty == "boss" ? cfg.bossHp : cfg.hp) : 1;
+            var u = new Unit { id = nid++, t = ty, T = T, team = T.team, x = x, y = y, hp = T.hp * hk, max = T.hp * hk, cd = Rnd() * (T.cd > 0 ? T.cd : 1), face = T.team == 1 ? M.PI : 0, retgt = Rnd() * 0.3f, r = T.r, ox = R(-70, 70), oy = R(-70, 70), steer = Rnd() < 0.5f ? 1 : -1 };
             u.pr = Dist(u, C); units.Add(u); return u;
         }
 
@@ -207,11 +210,18 @@ namespace PhamNhan.Sim
             foreach (var (ty, n) in list) for (int i = 0; i < n; i++, k++) { var u = AddUnit(ty, x0 - (k % 12) * 24 - ((k / 12) % 2) * 12, y0 + (k / 12) * 26); u.lead = lead; }
         }
 
-        void Def(string ty, float x, float y, Role role) { var u = AddUnit(ty, x, y); u.role = role; }
+        // mật độ thủ quân theo cấp cứ điểm: thấp hơn 1 thì bỏ bớt, cao hơn 1 thì thêm quân đứng cạnh
+        void Def(string ty, float x, float y, Role role)
+        {
+            float k = cfg.dens;
+            if (k < 1 && Rnd() > k) return;
+            var u = AddUnit(ty, x, y); u.role = role;
+            if (k > 1 && Rnd() < k - 1) { var v = AddUnit(ty, x + R(-28, 28), y + R(-28, 28)); v.role = role; }
+        }
 
         public void NewGame()
         {
-            rng = new Rng(20261102);
+            rng = new Rng(cfg.seed);
             t = 0; time = TIME; phase = 1; barrier = true; sec = new bool[4]; open = -1;
             snd.Clear(); units.Clear(); eyes.Clear(); proj.Clear(); fx.Clear(); decals.Clear(); floats.Clear(); zones.Clear(); teles.Clear(); ripples.Clear(); waves.Clear(); feed.Clear(); log.Clear();
             banner = null; warnS = null; warnT = 0; shake = 0; flashA = 0; killed = 0; totalEnemy = 0; lost = 0; flag = 0; contested = false; over = null; overT = 0;
@@ -221,7 +231,7 @@ namespace PhamNhan.Sim
             for (int i = 0; i < EYE_DEF.Length; i++)
             {
                 var d = EYE_DEF[i]; var p = EyePos(i);
-                var e = new Eye { i = i, el = d.el, weak = d.weak, x = p.x, y = p.y, a = M.Deg(d.a), hp = d.hp, max = d.hp, r = 30, team = 1, seals = d.seals, maxSeals = d.seals, name = ELEM[d.el].n, place = d.place, toolT = d.toolT };
+                var e = new Eye { i = i, el = d.el, weak = d.weak, x = p.x, y = p.y, a = M.Deg(d.a), hp = d.hp * cfg.eyeHp, max = d.hp * cfg.eyeHp, r = 30, team = 1, seals = Math.Max(1, d.seals + cfg.sealAdd), maxSeals = Math.Max(1, d.seals + cfg.sealAdd), name = ELEM[d.el].n, place = d.place, toolT = d.toolT };
                 e.vein = MakeVein(e, d.voff);
                 float ha = R(0, M.TAU), hr = R(60, 150); e.hx = e.x + M.Cos(ha) * hr; e.hy = e.y + M.Sin(ha) * hr;
                 eyes.Add(e);
@@ -276,8 +286,8 @@ namespace PhamNhan.Sim
             boss = AddUnit("boss", C.x - 230, C.y); boss.role = Role.Boss; boss.active = false; boss.cdT = 3; boss.cdK = 7; boss.home = new V2(C.x - 230, C.y); boss.hasHome = true; boss.key = "boss"; boss.D = CH_DEF["boss"];
             foes = new[] { boss, lang, thi, bo, ta };
             totalEnemy = EnemyCount(); startAlly = AllyCount();
-            PushFeed("Năm tướng Chính đạo áp sát Phù Vân Thành");
-            ShowBanner("Công thành · Phù Vân Thành", "Năm tướng mỗi phe · bốn trận nhãn ẩn nuôi bốn cung kết giới", 8.4f, "攻");
+            PushFeed("Năm tướng Chính đạo áp sát " + Name);
+            ShowBanner("Công thành · " + Name, cfg.tierName + (cfg.neutral ? " · tán tu trung lập trấn giữ" : " · Ma đạo trấn giữ") + " · bốn trận nhãn ẩn nuôi kết giới", 8.4f, "攻");
             SetMode("auto", true); PlanSet("split", -1, "", true);
         }
 
@@ -410,6 +420,7 @@ namespace PhamNhan.Sim
         {
             if (o == null) o = new HitOpt();
             if (tg == null || tg.dead) return;
+            if (src != null && src.team == 1) amt *= cfg.atk;
             if (tg is Eye) { HitEye((Eye)tg, amt, src, o); return; }
             var u = (Unit)tg;
             if (u == hero) { if (hero.invul > 0 || hero.dead) return; amt *= 0.7f; }
@@ -530,7 +541,7 @@ namespace PhamNhan.Sim
             if (strat != null) { strat.t -= dt; if (strat.t <= 0) strat = null; }
             if (intro > 0) { intro -= dt; UpdateFx(dt); return; }
             if (over != null) overT += dt;
-            else { time -= dt; if (time <= 0) { time = 0; Snd("lose", C.x, C.y); over = "lose"; overT = 0; ShowBanner("Hết giờ", "Thủ quân Phù Vân Thành giữ được thành", 4, null); } }
+            else { time -= dt; if (time <= 0) { time = 0; Snd("lose", C.x, C.y); over = "lose"; overT = 0; ShowBanner("Hết giờ", "Thủ quân " + Name + " giữ được thành", 4, null); } }
             if (AUTO) Autopilot();
             hoCd -= dt; phaCd -= dt; danCd -= dt; anCd -= dt;
             if (an < 3) { anT += dt; if (anT >= 20) { anT = 0; an++; } } else anT = 0;
@@ -651,7 +662,7 @@ namespace PhamNhan.Sim
                 if (flag >= flagNeed)
                 {
                     Snd("win", C.x, C.y); over = "win"; overT = 0; flagOwner = 0; Flash(0.8f, new Rgb(243, 217, 160));
-                    ShowBanner("Công phá Phù Vân Thành", "Cờ Chính đạo tung bay trên đài trung tâm", 3.6f, "捷"); PushFeed("Phù Vân Thành về tay Chính đạo");
+                    ShowBanner("Công phá " + Name, "Cờ Chính đạo tung bay trên đài trung tâm", 3.6f, "捷"); PushFeed(Name + " về tay Chính đạo");
                     foreach (var u in units) if (!u.dead && u.team == 1) u.stun = 99;
                 }
             }

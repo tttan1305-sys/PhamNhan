@@ -53,6 +53,13 @@ namespace PhamNhan.View
             var old = GUI.color; GUI.color = c; GUI.Box(r, GUIContent.none, panel); GUI.color = old;
         }
         public static void Fill(Rect r, Color c) { var old = GUI.color; GUI.color = c; GUI.DrawTexture(r, white); GUI.color = old; }
+        public static void Line(Vector2 a, Vector2 b, float w, Color c)
+        {
+            var m = GUI.matrix; float len = Vector2.Distance(a, b); if (len < 0.5f) return;
+            GUIUtility.RotateAroundPivot(Mathf.Atan2(b.y - a.y, b.x - a.x) * Mathf.Rad2Deg, a);
+            Fill(new Rect(a.x, a.y - w / 2, len, w), c); GUI.matrix = m;
+        }
+        public static void Ellipse(Vector2 c, float rx, float ry, Color col, bool ring = false) { var old = GUI.color; GUI.color = col; GUI.DrawTexture(new Rect(c.x - rx, c.y - ry, rx * 2, ry * 2), ring ? ringT : circle); GUI.color = old; }
         public static void Circle(Vector2 c, float r, Color col, bool ring = false) { var old = GUI.color; GUI.color = col; GUI.DrawTexture(new Rect(c.x - r, c.y - r, r * 2, r * 2), ring ? ringT : circle); GUI.color = old; }
 
         public static void Text(Rect r, string s, int size, Color c, TextAnchor anchor = TextAnchor.UpperLeft, bool bold = false, bool wrap = false, bool shadow = false)

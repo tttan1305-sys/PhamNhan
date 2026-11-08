@@ -16,7 +16,7 @@ namespace PhamNhan.View
             new GameObject("PhamNhan").AddComponent<App>();
         }
 
-        enum Screen_ { Menu, Help, Play, Pause, Roster }
+        enum Screen_ { Menu, Help, Play, Pause, Roster, World }
         Screen_ scr = Screen_.Menu;
         Siege G; WorldView view; Camera cam;
         Vector2 camPos; float zoom = Z0;
@@ -28,7 +28,7 @@ namespace PhamNhan.View
             UnityEngine.Screen.sleepTimeout = SleepTimeout.NeverSleep;
             UnityEngine.Screen.orientation = ScreenOrientation.LandscapeLeft;
             Input.multiTouchEnabled = true;
-            Shapes.Init(); Ui.Init(); CharSprites.Begin();
+            Shapes.Init(); Ui.Init(); CharSprites.Begin(); LoadWorld();
             cam = Camera.main;
             if (cam == null) { var go = new GameObject("Camera"); cam = go.AddComponent<Camera>(); go.tag = "MainCamera"; }
             cam.orthographic = true; cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = Shapes.Hex("#72bd55");
@@ -41,9 +41,11 @@ namespace PhamNhan.View
             camPos = new Vector2(C.x, C.y); zoom = 0.3f;
         }
 
-        void StartGame(bool auto)
+        void StartGame(bool auto, BattleCfg cfg = null)
         {
-            autoMode = auto; G = new Siege(auto); scr = Screen_.Play; zoom = Z0; camPos = new Vector2(C.x - 600, C.y);
+            if (cfg == null && campaign && G != null) cfg = G.cfg; // chơi lại cùng cứ điểm
+            campResolved = false;
+            autoMode = auto; G = new Siege(auto, cfg); scr = Screen_.Play; zoom = Z0; camPos = new Vector2(C.x - 600, C.y);
             joyId = -1; slashId = -1;
         }
 
@@ -52,7 +54,7 @@ namespace PhamNhan.View
         {
             float dt = Mathf.Min(1f / 30f, Time.deltaTime);
             CharSprites.Poll();
-            if (scr == Screen_.Menu || scr == Screen_.Help || scr == Screen_.Roster)
+            if (scr == Screen_.Menu || scr == Screen_.Help || scr == Screen_.Roster || scr == Screen_.World)
             {
                 menuT += dt; G.Update(dt); G.snd.Clear(); snd.SetTrack(Sound.Track.Menu);
                 if (G.over != null && G.overT > 4) { G = new Siege(true); G.intro = 0; }
@@ -61,6 +63,7 @@ namespace PhamNhan.View
                 return;
             }
             if (scr == Screen_.Pause) return;
+            if (campaign && !campResolved && G.over != null) { campResolved = true; W.Resolve(campNode, G.over == "win"); SaveWorld(); }
             ReadInput();
             float scale = (!G.AUTO && G.stratOn) ? 0.3f : 1f;
             G.Update(dt * scale);
@@ -76,7 +79,7 @@ namespace PhamNhan.View
             float sh = G.shake * 0.6f; var off = sh > 0.3f ? Random.insideUnitCircle * sh : Vector2.zero;
             cam.transform.position = new Vector3(camPos.x + off.x, -(camPos.y + off.y), -10);
             float vw = sz * 2 * cam.aspect, vh2 = sz * 2;
-            view.Render(G, Time.time, strat || scr == Screen_.Menu || scr == Screen_.Help || scr == Screen_.Roster, new Rect(camPos.x - vw / 2, camPos.y - vh2 / 2, vw, vh2));
+            view.Render(G, Time.time, strat || scr == Screen_.Menu || scr == Screen_.Help || scr == Screen_.Roster || scr == Screen_.World, new Rect(camPos.x - vw / 2, camPos.y - vh2 / 2, vw, vh2));
         }
 
         void PlaySounds()
@@ -230,7 +233,7 @@ namespace PhamNhan.View
             }
         }
         void Manual() { SkipIntro(); if (G.AUTO) G.AUTO = false; }
-        void GoMenu() { scr = Screen_.Menu; G = new Siege(true); G.intro = 0; }
+        void GoMenu() { campaign = false; scr = Screen_.Menu; G = new Siege(true); G.intro = 0; }
 
         // ================= giao diện =================
         void OnGUI()
@@ -244,6 +247,7 @@ namespace PhamNhan.View
                 case Screen_.Menu: DrawMenu(sa); break;
                 case Screen_.Help: DrawHelp(sa); break;
                 case Screen_.Roster: DrawRoster(sa); break;
+                case Screen_.World: DrawWorldMap(sa); break;
                 default: DrawWorldLabels(); DrawHud(sa); if (scr == Screen_.Pause) DrawPause(sa); break;
             }
             // nút trên màn hình chính, trợ giúp, tạm dừng dùng sự kiện chuột/chạm IMGUI
@@ -265,12 +269,13 @@ namespace PhamNhan.View
             var card = new Rect(cx - 300, 110, 600, 500);
             Ui.Box(card, new Color(1, 1, 1, 0.9f));
             Ui.Text(new Rect(card.x, card.y + 30, card.width, 70), "PHÀM NHÂN", 56, Ui.INK, TextAnchor.MiddleCenter, true);
-            Ui.Text(new Rect(card.x, card.y + 98, card.width, 30), "Công thành Phù Vân · năm tướng đấu năm tướng", 22, Ui.SUB, TextAnchor.MiddleCenter);
-            if (MenuButton(new Rect(cx - 220, card.y + 150, 440, 74), "Vào trận", true)) StartGame(false);
-            if (MenuButton(new Rect(cx - 220, card.y + 238, 440, 62), "Nhân vật", false)) { scr = Screen_.Roster; rosterT = 0; }
-            if (MenuButton(new Rect(cx - 220, card.y + 312, 216, 62), "Xem tự đánh", false)) StartGame(true);
-            if (MenuButton(new Rect(cx + 4, card.y + 312, 216, 62), "Cách chơi", false)) scr = Screen_.Help;
-            Ui.Text(new Rect(card.x, card.y + 410, card.width, 60), "Bản thử nghiệm Unity 3 · thêm tạo hình nhân vật", 18, Ui.SUB, TextAnchor.MiddleCenter);
+            Ui.Text(new Rect(card.x, card.y + 98, card.width, 30), "Năm mươi cứ điểm · năm tướng đấu năm tướng", 22, Ui.SUB, TextAnchor.MiddleCenter);
+            if (MenuButton(new Rect(cx - 220, card.y + 146, 440, 74), "Chinh chiến thiên hạ", true)) OpenWorld();
+            if (MenuButton(new Rect(cx - 220, card.y + 234, 216, 60), "Trận nhanh", false)) { campaign = false; StartGame(false); }
+            if (MenuButton(new Rect(cx + 4, card.y + 234, 216, 60), "Nhân vật", false)) { scr = Screen_.Roster; rosterT = 0; }
+            if (MenuButton(new Rect(cx - 220, card.y + 306, 216, 60), "Xem tự đánh", false)) { campaign = false; StartGame(true); }
+            if (MenuButton(new Rect(cx + 4, card.y + 306, 216, 60), "Cách chơi", false)) scr = Screen_.Help;
+            Ui.Text(new Rect(card.x, card.y + 400, card.width, 60), "Bản thử nghiệm Unity 4 · bản đồ 50 cứ điểm", 18, Ui.SUB, TextAnchor.MiddleCenter);
             SoundToggles(new Rect(sa.xMax - 300, sa.yMax - 64, 288, 52));
         }
 
@@ -296,12 +301,13 @@ namespace PhamNhan.View
             Ui.Box(card, new Color(1, 1, 1, 0.95f));
             Ui.Text(new Rect(card.x + 36, card.y + 24, 800, 44), "Cách chơi", 34, Ui.INK, TextAnchor.UpperLeft, true);
             string body =
-                "<b>Mục tiêu</b>: phá trận nhãn để mở kết giới, vào thành hạ Trấn thủ Huyết Sát Phó Tướng, rồi giữ đài trung tâm 15 giây. Có 15 phút.\n\n" +
+                "<b>Chinh chiến thiên hạ</b>: bản đồ 50 cứ điểm (30 thôn trấn, 10 thành trì, 5 đại thành, 5 thánh địa). Chỉ đánh được cứ điểm kề lãnh thổ Chính đạo, cấp càng cao thủ quân càng đông và mạnh. Sau mỗi trận Ma đạo đi một lượt. Giữ cả năm Thánh địa 3 ngày để thắng mùa.\n\n" +
+                "<b>Mục tiêu trận</b>: phá trận nhãn để mở kết giới, vào thành hạ Trấn thủ Huyết Sát Phó Tướng, rồi giữ đài trung tâm 15 giây. Có 15 phút.\n\n" +
                 "<b>Trận nhãn ẩn</b>: bốn hướng có bốn trận nhãn ẩn nuôi bốn cung kết giới. Đến gần thấy linh khí dao động thì bấm <b>眼 Phá Vọng Nhãn</b> để soi. Ấn bảo hộ chỉ vỡ bằng hành khắc: Kim cần Hỏa (Lôi Hỏa Phù), Thủy cần Thổ (Trấn Sơn Ấn), Hỏa cần Thủy (Thủy Nguyệt), Mộc cần Kim (Ngự Kiếm). Phá Trận Phù phá được mọi ấn. Ấn vỡ hết thì lõi lộ ra 9 giây.\n\n" +
                 "<b>Điều khiển</b>: kéo nửa trái màn hình để đi. Giữ nút 劍 lớn để chém. Bốn nút quanh là Ngự Kiếm, Lôi Hỏa Phù, Vạn Kiếm (đứng trong Hộ Sơn Đại Trận), Phá Vọng Nhãn. Nút nhỏ: 遁 độn thuật, 丹 uống đan. Hàng trên: Hộ Sơn Đại Trận, Phá Trận Phù, Trấn Sơn Ấn.\n\n" +
                 "<b>Thế trận</b>: Tự quyết để quân sư chọn, Phân binh đánh ba hướng, Hợp binh để bốn tướng theo hướng bạn đang đánh. Nút Sa bàn xem toàn cục.\n\n" +
                 "Trên máy tính: WASD đi, J chém, 1 2 3 4 kỹ năng, Shift độn, T F G trận pháp, H đan, Q E R thế trận, M sa bàn.";
-            Ui.Text(new Rect(card.x + 36, card.y + 84, card.width - 72, 470), body, 19, Ui.INK, TextAnchor.UpperLeft, false, true);
+            Ui.Text(new Rect(card.x + 36, card.y + 80, card.width - 72, 480), body, 16, Ui.INK, TextAnchor.UpperLeft, false, true);
             if (MenuButton(new Rect(card.x + card.width / 2 - 160, card.yMax - 84, 320, 60), "Đã hiểu", true)) scr = Screen_.Menu;
         }
 
@@ -312,7 +318,7 @@ namespace PhamNhan.View
             Ui.Text(new Rect(card.x, card.y + 24, card.width, 50), "Tạm dừng", 34, Ui.INK, TextAnchor.MiddleCenter, true);
             if (MenuButton(new Rect(cx - 180, card.y + 100, 360, 64), "Tiếp tục", true)) scr = Screen_.Play;
             if (MenuButton(new Rect(cx - 180, card.y + 180, 360, 60), "Chơi lại", false)) StartGame(autoMode);
-            if (MenuButton(new Rect(cx - 180, card.y + 256, 360, 60), "Về màn hình chính", false)) GoMenu();
+            if (MenuButton(new Rect(cx - 180, card.y + 256, 360, 60), campaign ? "Rút quân về bản đồ" : "Về màn hình chính", false)) { if (campaign) OpenWorld(); else GoMenu(); }
             SoundToggles(new Rect(cx - 180, card.y + 328, 360, 52));
         }
 
@@ -463,7 +469,7 @@ namespace PhamNhan.View
                 float w = Mathf.Min(720, RW - 560); var r = new Rect(cx - w / 2, topY, w, 30 + Ui.TextH(sub ?? "", 15, w - 80) + 14);
                 Ui.Box(r, new Color(1, 1, 1, 0.93f));
                 Ui.Text(new Rect(r.x + 14, r.y + 8, 40, 40), gl, 30, Ui.JADE, TextAnchor.UpperLeft, true);
-                Ui.Text(new Rect(r.x + 60, r.y + 8, w - 74, 24), (g.intro > 0 ? "Phù Vân Thành · " : "") + title, 18, Ui.INK, TextAnchor.UpperLeft, true);
+                Ui.Text(new Rect(r.x + 60, r.y + 8, w - 74, 24), (g.intro > 0 ? g.Name + " · " : "") + title, 18, Ui.INK, TextAnchor.UpperLeft, true);
                 Ui.Text(new Rect(r.x + 60, r.y + 34, w - 74, 80), sub ?? "", 15, Ui.SUB, TextAnchor.UpperLeft, false, true);
                 topY = r.yMax + 6;
             }
@@ -552,7 +558,7 @@ namespace PhamNhan.View
             var g = G; bool win = g.over == "win";
             Ui.Fill(new Rect(0, 0, RW, 720), new Color(0.06f, 0.16f, 0.13f, 0.45f));
             float cx = RW / 2; var card = new Rect(cx - 300, 120, 600, 480); Ui.Box(card, new Color(1, 1, 1, 0.95f));
-            Ui.Text(new Rect(card.x, card.y + 26, card.width, 60), win ? "捷 Công phá Phù Vân Thành" : "Thủ quân giữ được thành", 32, win ? Ui.JADE : Ui.FOE, TextAnchor.MiddleCenter, true);
+            Ui.Text(new Rect(card.x, card.y + 26, card.width, 60), win ? "捷 Công phá " + g.Name : "Thủ quân giữ được " + g.Name, 32, win ? Ui.JADE : Ui.FOE, TextAnchor.MiddleCenter, true);
             string[] rows = {
                 "Thời gian|" + Ui.Clock(TIME - g.time),
                 "Quân địch bị diệt|" + g.killed,
@@ -567,8 +573,16 @@ namespace PhamNhan.View
                 Ui.Text(new Rect(card.x + 70, y, 300, 30), p[0], 20, Ui.SUB);
                 Ui.Text(new Rect(card.xMax - 270, y, 200, 30), p[1], 20, Ui.INK, TextAnchor.UpperRight, true);
             }
-            if (MenuButton(new Rect(cx - 250, card.yMax - 96, 240, 64), "Chơi lại", true)) StartGame(autoMode);
-            if (MenuButton(new Rect(cx + 10, card.yMax - 96, 240, 64), "Màn hình chính", false)) GoMenu();
+            if (campaign)
+            {
+                if (MenuButton(new Rect(cx - 250, card.yMax - 96, 240, 64), "Về bản đồ", true)) OpenWorld();
+                if (MenuButton(new Rect(cx + 10, card.yMax - 96, 240, 64), "Màn hình chính", false)) GoMenu();
+            }
+            else
+            {
+                if (MenuButton(new Rect(cx - 250, card.yMax - 96, 240, 64), "Chơi lại", true)) StartGame(autoMode);
+                if (MenuButton(new Rect(cx + 10, card.yMax - 96, 240, 64), "Màn hình chính", false)) GoMenu();
+            }
         }
     }
 }
