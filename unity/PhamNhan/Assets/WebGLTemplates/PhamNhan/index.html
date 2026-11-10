@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>{{{ PRODUCT_NAME }}}</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0f2a22; overflow: hidden; }
+    #c { width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+    #l { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #e8f5ee; font: 600 22px system-ui, sans-serif; }
+    #b { width: 280px; height: 8px; background: #ffffff2a; border-radius: 4px; margin-top: 16px; overflow: hidden; }
+    #f { height: 100%; width: 0; background: #10a37f; transition: width .2s; }
+    #m { font: 400 14px system-ui, sans-serif; opacity: .75; margin-top: 12px; max-width: 80vw; text-align: center; }
+    #r { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; padding: 24px; background: #0f2a22; color: #e8f5ee; font: 600 20px system-ui, sans-serif; }
+    @media (orientation: portrait) and (max-width: 700px) { #r { display: flex; } }
+  </style>
+</head>
+<body>
+  <canvas id="c" tabindex="-1"></canvas>
+  <div id="l"><div>Phàm Nhân · đang tải</div><div id="b"><div id="f"></div></div><div id="m">Lần đầu mở có thể mất một lúc</div></div>
+  <div id="r">Xoay ngang điện thoại để chơi</div>
+  <script>
+    var buildUrl = "Build";
+    var config = {
+      dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+      frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+      codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#if MEMORY_FILENAME
+      memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+      symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      matchWebGLToCanvasSize: true,
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+    };
+    var s = document.createElement("script");
+    s.src = buildUrl + "/{{{ LOADER_FILENAME }}}";
+    s.onload = function () {
+      createUnityInstance(document.querySelector("#c"), config, function (p) {
+        document.querySelector("#f").style.width = (100 * p) + "%";
+      }).then(function (u) {
+        document.querySelector("#l").remove(); window.unityInstance = u;
+      }).catch(function (e) { document.querySelector("#m").textContent = "Lỗi: " + e; });
+    };
+    document.body.appendChild(s);
+  </script>
+</body>
+</html>
