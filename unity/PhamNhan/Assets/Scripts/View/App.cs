@@ -316,7 +316,7 @@ namespace PhamNhan.View
         bool MenuButtonSmall(Rect r, string label, bool on)
         {
             Ui.Box(r, on ? Ui.JADE : new Color(1, 1, 1, 0.92f));
-            Ui.Text(r, label, 18, on ? Color.white : Ui.INK, TextAnchor.MiddleCenter, true);
+            Ui.Text(r, label, 16, on ? Color.white : Ui.INK, TextAnchor.MiddleCenter, true);
             var e = Event.current;
             if (e.type == EventType.MouseDown && r.Contains(e.mousePosition)) { e.Use(); snd.Play("tap"); return true; }
             return false;
@@ -434,7 +434,7 @@ namespace PhamNhan.View
             // ---- trên trái: mục tiêu ----
             var obj = new Rect(L, T, 330, 108); Ui.Box(obj, panelC);
             string ph = g.phase == 1 ? "Phá trận nhãn, mở cửa" : g.phase == 2 ? "Hạ Trấn thủ, diệt thủ quân" : "Giữ đài trung tâm";
-            Ui.Text(new Rect(obj.x + 14, obj.y + 8, 220, 24), "Giai đoạn " + g.phase + " · " + ph, 15, Ui.INK, TextAnchor.UpperLeft, true);
+            Ui.Text(new Rect(obj.x + 14, obj.y + 8, 220, 24), "Giai đoạn " + g.phase + " · " + ph, 13, Ui.INK, TextAnchor.UpperLeft, true);
             Ui.Text(new Rect(obj.xMax - 90, obj.y + 6, 78, 26), Ui.Clock(g.time), 20, g.time < 120 ? Ui.FOE : Ui.INK, TextAnchor.UpperRight, true);
             for (int i = 0; i < 4; i++)
             {

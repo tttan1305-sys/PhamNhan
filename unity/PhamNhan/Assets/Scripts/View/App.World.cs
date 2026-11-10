@@ -19,7 +19,7 @@ namespace PhamNhan.View
         void OpenWorld()
         {
             scr = Screen_.World; campaign = false; G = new Siege(true); G.intro = 0;
-            if (wSel < 0 || wSel >= W.nodes.Count) { wSel = -1; foreach (var n in W.nodes) if (W.CanAttack(n.id)) { wSel = n.id; break; } }
+            if (wSel < 0 || wSel >= W.nodes.Count) { wSel = -1; foreach (var n in W.nodes) if (W.CanAttack(n.id) && (wSel < 0 || n.tier < W.nodes[wSel].tier)) wSel = n.id; }
         }
 
         static Color OwnerCol(int o) { return o == World.CHINH ? Ui.ALLY : o == World.MA ? Ui.FOE : new Color(0.62f, 0.6f, 0.54f); }
