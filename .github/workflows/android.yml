@@ -159,6 +159,17 @@ jobs:
           name: PhamNhan-WebGL
           path: site
 
+      - name: Đóng gói bản web lên trang Releases
+        if: steps.check.outputs.ok == 'true' && github.event_name != 'pull_request'
+        run: cd site && zip -qr ../PhamNhan-web.zip .
+
+      - uses: softprops/action-gh-release@v2
+        if: steps.check.outputs.ok == 'true' && github.event_name != 'pull_request'
+        with:
+          tag_name: ban-thu-nghiem
+          prerelease: true
+          files: PhamNhan-web.zip
+
       - uses: actions/upload-pages-artifact@v3
         if: steps.check.outputs.ok == 'true' && github.event_name != 'pull_request'
         with:
