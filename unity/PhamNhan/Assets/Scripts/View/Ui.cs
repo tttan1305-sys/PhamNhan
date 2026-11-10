@@ -5,7 +5,7 @@ namespace PhamNhan.View
     /// <summary>Kiểu chữ, khung bo góc và hàm vẽ giao diện IMGUI theo khung tham chiếu cao 720.</summary>
     public static class Ui
     {
-        public static Font font;
+        public static Font font, fontB;
         public static Texture2D round, roundSm, circle, white, ringT;
         public static GUIStyle panel, panelDark, txt;
         public static readonly Color INK = Shapes.Hex("#17302a"), SUB = Shapes.Hex("#4a6a60"), JADE = Shapes.Hex("#10a37f"), ALLY = Shapes.Hex("#2f8fe0"), FOE = Shapes.Hex("#e5483d"), GOLD = Shapes.Hex("#f3c64a");
@@ -14,7 +14,9 @@ namespace PhamNhan.View
         public static void Init()
         {
             if (ready) return; ready = true;
-            try { font = Font.CreateDynamicFontFromOSFont(new[] { "Roboto", "Noto Sans", "Segoe UI", "Helvetica Neue", "Arial", "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei" }, 32); } catch { font = null; }
+            // phông đi kèm game (Noto Sans + chữ Hán dùng trong game), cần cho bản web vì trình duyệt không cho dùng phông hệ thống
+            font = Resources.Load<Font>("Fonts/PhamNhanRegular"); fontB = Resources.Load<Font>("Fonts/PhamNhanBold");
+            if (font == null) try { font = Font.CreateDynamicFontFromOSFont(new[] { "Roboto", "Noto Sans", "Segoe UI", "Helvetica Neue", "Arial", "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei" }, 32); } catch { font = null; }
             round = Rounded(48, 16); roundSm = Rounded(24, 8);
             circle = Disc(96, false); ringT = Disc(96, true);
             white = new Texture2D(1, 1); white.SetPixel(0, 0, Color.white); white.Apply();
@@ -64,13 +66,13 @@ namespace PhamNhan.View
 
         public static void Text(Rect r, string s, int size, Color c, TextAnchor anchor = TextAnchor.UpperLeft, bool bold = false, bool wrap = false, bool shadow = false)
         {
-            txt.fontSize = size; txt.alignment = anchor; txt.fontStyle = bold ? FontStyle.Bold : FontStyle.Normal; txt.wordWrap = wrap;
+            txt.fontSize = size; txt.alignment = anchor; txt.font = bold && fontB != null ? fontB : font; txt.fontStyle = bold && fontB == null ? FontStyle.Bold : FontStyle.Normal; txt.wordWrap = wrap;
             if (shadow) { txt.normal.textColor = new Color(0, 0, 0, 0.55f * c.a); GUI.Label(new Rect(r.x + 1.5f, r.y + 1.5f, r.width, r.height), s, txt); }
             txt.normal.textColor = c; GUI.Label(r, s, txt);
         }
         public static float TextH(string s, int size, float w)
         {
-            txt.fontSize = size; txt.wordWrap = true; return txt.CalcHeight(new GUIContent(s), w);
+            txt.font = font; txt.fontStyle = FontStyle.Normal; txt.fontSize = size; txt.wordWrap = true; return txt.CalcHeight(new GUIContent(s), w);
         }
         public static void Bar(Rect r, float k, Color c)
         {

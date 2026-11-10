@@ -32,20 +32,26 @@ namespace PhamNhan.View
             }
         }
 
+        static Raw RenderKey(string k)
+        {
+            var r = new Raw { key = k, px = Px(k) };
+            for (int i = 0; i < Chars.FRAMES; i++) r.f[i] = Chars.Render(k, i, r.px).Bytes(true);
+            return r;
+        }
+
+        /// <summary>Dựng ở luồng phụ (điện thoại, máy tính).</summary>
         public static void Begin()
         {
-            if (task != null) return;
-            task = Task.Run(() =>
-            {
-                var list = new List<Raw>();
-                foreach (var k in Chars.Keys)
-                {
-                    var r = new Raw { key = k, px = Px(k) };
-                    for (int i = 0; i < Chars.FRAMES; i++) r.f[i] = Chars.Render(k, i, r.px).Bytes(true);
-                    list.Add(r);
-                }
-                return list;
-            });
+            if (task != null || !App.THREADS) return;
+            task = Task.Run(() => { var list = new List<Raw>(); foreach (var k in Chars.Keys) list.Add(RenderKey(k)); return list; });
+        }
+
+        /// <summary>Dựng từng nhân vật mỗi khung hình (bản web không có luồng phụ).</summary>
+        public static IEnumerator<float> BuildSteps()
+        {
+            var list = new List<Raw>();
+            for (int i = 0; i < Chars.Keys.Count; i++) { list.Add(RenderKey(Chars.Keys[i])); yield return (i + 1f) / Chars.Keys.Count; }
+            Finish(list);
         }
 
         /// <summary>Gọi mỗi khung hình cho tới khi xong.</summary>
@@ -53,7 +59,12 @@ namespace PhamNhan.View
         {
             if (Ready || task == null || !task.IsCompleted) return;
             if (task.Status != TaskStatus.RanToCompletion) { Debug.LogWarning("Dựng tạo hình lỗi: " + task.Exception); task = null; return; }
-            foreach (var r in task.Result)
+            Finish(task.Result); task = null;
+        }
+
+        static void Finish(List<Raw> raws)
+        {
+            foreach (var r in raws)
             {
                 var sp = Chars.Get(r.key); var s = new Set { spec = sp };
                 float side = sp.ax1 - sp.ax0;
@@ -69,7 +80,7 @@ namespace PhamNhan.View
                 s.faceUV = new Rect(u0, v0, w, w);
                 sets[r.key] = s;
             }
-            task = null; Ready = true;
+            Ready = true;
         }
 
         static Sprite Make(byte[] src, int px, bool mask)

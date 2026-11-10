@@ -47,6 +47,27 @@ namespace PhamNhan.EditorTools
             EditorUserBuildSettings.buildAppBundle = false;
         }
 
+        const string WebPath = "build/WebGL/PhamNhan";
+
+        [MenuItem("Phàm Nhân/Build WebGL")]
+        public static void BuildWebGL()
+        {
+            EnsureScene();
+            ApplySettings();
+            // nén Brotli và tự giải nén bằng JS để chạy trên mọi máy chủ tĩnh (GitHub Pages)
+            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Brotli;
+            PlayerSettings.WebGL.decompressionFallback = true;
+            PlayerSettings.WebGL.template = "PROJECT:PhamNhan";
+            PlayerSettings.WebGL.dataCaching = true;
+            PlayerSettings.WebGL.nameFilesAsHashes = false;
+            PlayerSettings.runInBackground = true;
+            Directory.CreateDirectory(WebPath);
+            var opts = new BuildPlayerOptions { scenes = new[] { ScenePath }, locationPathName = WebPath, target = BuildTarget.WebGL, targetGroup = BuildTargetGroup.WebGL, options = BuildOptions.None };
+            var report = BuildPipeline.BuildPlayer(opts);
+            Debug.Log("Build WebGL: " + report.summary.result + " · " + report.summary.totalSize + " byte · " + WebPath);
+            if (report.summary.result != BuildResult.Succeeded && Application.isBatchMode) EditorApplication.Exit(1);
+        }
+
         [MenuItem("Phàm Nhân/Build Android APK")]
         public static void BuildAndroid()
         {

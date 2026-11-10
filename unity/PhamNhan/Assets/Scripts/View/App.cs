@@ -9,6 +9,12 @@ namespace PhamNhan.View
     /// <summary>Điều khiển toàn bộ trò chơi: màn hình chính, trận đấu, máy quay, cảm ứng và giao diện.</summary>
     public partial class App : MonoBehaviour
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        public const bool THREADS = false; // trình duyệt: không có luồng phụ
+#else
+        public const bool THREADS = true;
+#endif
+        float loadK = 1; string loadMsg;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot()
         {
@@ -24,9 +30,9 @@ namespace PhamNhan.View
 
         void Awake()
         {
-            Application.targetFrameRate = 60;
+            if (THREADS) Application.targetFrameRate = 60;
             UnityEngine.Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            UnityEngine.Screen.orientation = ScreenOrientation.LandscapeLeft;
+            if (Application.isMobilePlatform && THREADS) UnityEngine.Screen.orientation = ScreenOrientation.LandscapeLeft;
             Input.multiTouchEnabled = true;
             Shapes.Init(); Ui.Init(); CharSprites.Begin(); LoadWorld();
             cam = Camera.main;
@@ -39,6 +45,27 @@ namespace PhamNhan.View
             G.intro = 0;
             view.BuildStatic(G);
             camPos = new Vector2(C.x, C.y); zoom = 0.3f;
+        }
+
+        void Start() { if (!THREADS) StartCoroutine(LoadWeb()); }
+
+        /// <summary>Bản web: dựng tạo hình và âm thanh rải qua nhiều khung hình, có màn chờ.</summary>
+        System.Collections.IEnumerator LoadWeb()
+        {
+            loadK = 0; loadMsg = "Đang vẽ nhân vật"; yield return null; yield return null;
+            var a = CharSprites.BuildSteps(); while (a.MoveNext()) { loadK = a.Current * 0.5f; yield return null; }
+            loadMsg = "Đang tạo âm thanh và nhạc"; yield return null;
+            var b = snd.BuildSteps(); while (b.MoveNext()) { loadK = 0.5f + b.Current * 0.5f; yield return null; }
+            loadK = 1;
+        }
+
+        void DrawLoading()
+        {
+            Ui.Fill(new Rect(0, 0, RW, 720), new Color(0.06f, 0.16f, 0.13f, 0.55f));
+            var card = new Rect(RW / 2 - 260, 250, 520, 200); Ui.Box(card, new Color(1, 1, 1, 0.95f));
+            Ui.Text(new Rect(card.x, card.y + 26, card.width, 50), "PHÀM NHÂN", 40, Ui.INK, TextAnchor.MiddleCenter, true);
+            Ui.Text(new Rect(card.x, card.y + 86, card.width, 30), loadMsg + "...", 18, Ui.SUB, TextAnchor.MiddleCenter);
+            Ui.Bar(new Rect(card.x + 40, card.y + 136, card.width - 80, 10), loadK, Ui.JADE);
         }
 
         void StartGame(bool auto, BattleCfg cfg = null)
@@ -242,6 +269,7 @@ namespace PhamNhan.View
             if (Event.current.type == EventType.Layout) return;
             if (Event.current.type == EventType.Repaint) btns.Clear();
             var sa = Safe();
+            if (loadK < 1) { DrawLoading(); return; }
             switch (scr)
             {
                 case Screen_.Menu: DrawMenu(sa); break;

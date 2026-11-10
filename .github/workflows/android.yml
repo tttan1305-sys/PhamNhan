@@ -1,4 +1,4 @@
-name: Build APK Android
+name: Build Android và web
 
 on:
   push:
@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   android:
@@ -88,3 +90,92 @@ jobs:
           body: "Bản build tự động từ nhánh main (lần chạy ${{ github.run_number }}). Tải PhamNhan.apk về điện thoại Android rồi mở để cài."
           prerelease: true
           files: PhamNhan.apk
+
+  webgl:
+    name: Build WebGL
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Kiểm tra tài khoản Unity trong mục bí mật
+        id: check
+        env:
+          UL: ${{ secrets.UNITY_LICENSE }}
+          UE: ${{ secrets.UNITY_EMAIL }}
+          UP: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          if [ -z "$UL" ] || [ -z "$UE" ] || [ -z "$UP" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Chưa có đủ UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD, bỏ qua bước build."
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.check.outputs.ok == 'true'
+
+      - name: Giải phóng dung lượng máy build
+        if: steps.check.outputs.ok == 'true'
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - uses: actions/cache@v4
+        if: steps.check.outputs.ok == 'true'
+        with:
+          path: unity/PhamNhan/Library
+          key: Library-WebGL-${{ hashFiles('unity/PhamNhan/Assets/**', 'unity/PhamNhan/Packages/**', 'unity/PhamNhan/ProjectSettings/**') }}
+          restore-keys: Library-WebGL-
+
+      - name: Build bằng Unity
+        if: steps.check.outputs.ok == 'true'
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: unity/PhamNhan
+          targetPlatform: WebGL
+          buildMethod: PhamNhan.EditorTools.BuildScript.BuildWebGL
+          versioning: None
+
+      - name: Gom file trang web
+        if: steps.check.outputs.ok == 'true'
+        run: |
+          DIR=$(sudo find . -type d -path "*build/WebGL/PhamNhan" -not -path "*/Library/*" | head -1)
+          test -n "$DIR"
+          mkdir -p site && sudo cp -r "$DIR"/. site/ && sudo chown -R "$(id -u)" site
+          touch site/.nojekyll
+          ls -la site site/Build
+
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.ok == 'true'
+        with:
+          name: PhamNhan-WebGL
+          path: site
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.check.outputs.ok == 'true' && github.event_name != 'pull_request'
+        with:
+          path: site
+
+  pages:
+    name: Đăng bản web lên GitHub Pages
+    needs: webgl
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Đăng
+        id: deploy
+        uses: actions/deploy-pages@v4

@@ -39,8 +39,11 @@ namespace PhamNhan.View
         void Awake()
         {
             musicOn = PlayerPrefs.GetInt("music", 1) == 1; sfxOn = PlayerPrefs.GetInt("sfx", 1) == 1;
-            sfxTask = Task.Run(() => Synth.MakeSfx());
-            musTask = Task.Run(() => new[] { Synth.MusicMenu(), Synth.MusicBattle(false), Synth.MusicBattle(true) });
+            if (App.THREADS)
+            {
+                sfxTask = Task.Run(() => Synth.MakeSfx());
+                musTask = Task.Run(() => new[] { Synth.MusicMenu(), Synth.MusicBattle(false), Synth.MusicBattle(true) });
+            }
             for (int i = 0; i < 14; i++) { var s = gameObject.AddComponent<AudioSource>(); s.playOnAwake = false; s.spatialBlend = 0; pool.Add(s); }
             musA = gameObject.AddComponent<AudioSource>(); musB = gameObject.AddComponent<AudioSource>();
             foreach (var m in new[] { musA, musB }) { m.loop = true; m.playOnAwake = false; m.volume = 0; m.spatialBlend = 0; }
@@ -82,6 +85,17 @@ namespace PhamNhan.View
         }
 
         public void SetTrack(Track t) { want = t; }
+
+        /// <summary>Tổng hợp âm thanh từng phần mỗi khung hình (bản web không có luồng phụ).</summary>
+        public IEnumerator<float> BuildSteps()
+        {
+            foreach (var kv in Synth.MakeSfx()) clips[kv.Key] = Clip(kv.Key, kv.Value);
+            yield return 0.25f;
+            var menu = Clip("menu", Synth.MusicMenu()); yield return 0.5f;
+            var battle = Clip("battle", Synth.MusicBattle(false)); yield return 0.75f;
+            var climax = Clip("climax", Synth.MusicBattle(true));
+            music = new[] { menu, battle, climax }; yield return 1;
+        }
 
         /// <summary>Phát một tiếng. near: 1 khi ở giữa màn hình, giảm dần về 0 khi ở xa ngoài khung nhìn.</summary>
         public void Play(string id, float near = 1, float pitchJitter = 0.05f)
